@@ -3,7 +3,7 @@
 Name: optimal_functions.php.inc
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.3(beta)
+Version: 0.3a(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -32,8 +32,8 @@ function headJS () {
 	$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) ?
 		str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) :
 		'';
-	$imgCollapsed = $root.$path."/img/imgCollapsed.gif";
-	$imgExpanded = $root.$path."/img/imgExpanded.gif";
+	$imgCollapsed = $root.$path."/img/imgCollapsed12x12.gif";
+	$imgExpanded = $root.$path."/img/imgExpanded12x12.gif";
 
 ?>
 <script type="text/javascript">
@@ -223,7 +223,7 @@ function printForm () {
 	<tr>
       <td class="formElement" colspan="2"><a href="<?= $PHP_SELF ?>?url=http://hosting.opml.org/yabfog/dailyReading.opml" title="Click here to render a sample OPML file">Render Sample OPML</a></td>
       <td class="formElement" colspan="2" style="text-align: right; height: 4ex; vertical-align: bottom;">
-        <a href="http://www.scripting.com/" target="_blank"><img src="img/thanksdave3.jpg" alt="Thanks, Dave!" title="Thanks, Dave!"></a>
+        <a href="http://www.scripting.com/" target="_blank"><img src="img/thanksdave.gif" alt="Thanks, Dave!" title="Thanks, Dave!"></a>
       </td>
     </tr>
 	<tr>
@@ -244,9 +244,9 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 
 	$cachefile = dirname(__FILE__).'/_cache/'.md5($url).'.'.strtolower($type).'.xml';
 	
-	$debuginfo = "<br />\n<code>\n$type URL: $url<br />\nCache file: ";
-	$debuginfo .= $cachefile ? basename($cachefile) : "None";
-	$debuginfo .= "<br />\n</code>\n";
+	$debuginfo = "<br/>$type URL: <a href=\"$url\">$url</a><br/>\nCache file: ";
+	$debuginfo .= $cachefile ? '<a href="'.$path.'/_cache/'.basename($cachefile).'">'.basename($cachefile).'</a>' : "None";
+	$debuginfo .= "<br/>\n";
 
 	// Get file contents
 	if ( $forceRefresh != '1' && file_exists($cachefile) && ( filesize($cachefile) > 0 ) && ( filemtime($cachefile) > ( time() - 1200 ) ) ) {
@@ -254,7 +254,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 		$xml = file_get_contents($cachefile);
 
 		if (empty($xml))  {
-			return "Error reading $type file.$debuginfo";
+			return "<li class=\"outlineItem\">Error reading $type file.$debuginfo</li>";
 		}
 
 	} else {
@@ -274,7 +274,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 				$xml = file_get_contents($cachefile);
 
 				if (empty($xml))  {
-					return "Error reading $type file in CURL.$debuginfo";
+					return "<li class=\"outlineItem\">Error reading $type file in CURL.$debuginfo</li>";
 				}
 				$xml_is_cached = TRUE;
 			}
@@ -287,7 +287,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 				$xml = file_get_contents($cachefile);
 
 				if (empty($xml))  {
-					return "Error reading $type file.$debuginfo";
+					return "<li class=\"outlineItem\">Error reading $type file.$debuginfo</li>";
 				}
 				$xml_is_cached = TRUE;
 			}
@@ -334,8 +334,11 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 		}
 	}
 
-	if ($type == 'RSS' && $linkTarget) {
+	elseif ($type == 'RSS') {
+		$parameter_array = array ( 'path' => 'http://'.$_SERVER['SERVER_NAME'].$path );
+		if ($linkTarget) {
 			$parameter_array['linkTarget'] = $linkTarget;
+		}
 	}
 
 	// This is the magic that searches for the best available XSLT rendering
@@ -354,7 +357,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 	} elseif (function_exists('domxml_open_mem') && function_exists('domxml_xslt_stylesheet')) {  // PHP 4 DOM_XML support
 
 		if (!$domXml = domxml_open_mem($xml)) {
-			$result = "Error while parsing the $type document.$debuginfo";
+			$result = "<li class=\"outlineItem\">Error while parsing the $type document.$debuginfo</li>";
 		}
 		
 		$domXsltObj = domxml_xslt_stylesheet( $xsl );
@@ -383,7 +386,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 		}
 
 	} elseif (!$result) {
-		$result = "Horrific XSLT error - check logs.$debuginfo";
+		$result = "<li class=\"outlineItem\">Horrific XSLT error - check logs.$debuginfo</li>";
 		unlink($cachefile); //Delete the cachefile - maybe it's corrupt.
 	}
 

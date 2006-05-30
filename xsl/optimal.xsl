@@ -19,8 +19,8 @@
 	<xsl:param name="linkTarget"/>
 	<xsl:param name="nodeRender"><xsl:value-of select="$path"/>/optimal.php</xsl:param>
 
-	<xsl:variable name="imgCollapsed"><xsl:value-of select="$path"/>/img/imgCollapsed.gif</xsl:variable>
-	<xsl:variable name="imgExpanded"><xsl:value-of select="$path"/>/img/imgExpanded.gif</xsl:variable>
+	<xsl:variable name="imgCollapsed"><xsl:value-of select="$path"/>/img/imgCollapsed12x12.gif</xsl:variable>
+	<xsl:variable name="imgExpanded"><xsl:value-of select="$path"/>/img/imgExpanded12x12.gif</xsl:variable>
 	<xsl:variable name="imgOPMLlogo"><xsl:value-of select="$path"/>/img/opml.gif</xsl:variable>
 	<xsl:variable name="imgOPML"><xsl:value-of select="$path"/>/img/redArrow.gif</xsl:variable>
 	<xsl:variable name="imgXML"><xsl:value-of select="$path"/>/img/feed-icon-12x12.gif</xsl:variable>
@@ -191,7 +191,7 @@
 				<xsl:choose>
 					<xsl:when test="$isOPML = 'true' or (@xmlUrl != '')">
 						<xsl:attribute name="style">
-							<xsl:text>display:none; margin-left: 15px;</xsl:text>
+							<xsl:text>display:none; margin-left: 18px;</xsl:text>
 						</xsl:attribute>
 						<xsl:element name="li">
            					<xsl:attribute name="class">
@@ -324,8 +324,7 @@
 		<!-- 
 			This template returns 'true' if:
 			(1) @url ends in .opml or .OPML
-			(2) @type = opml - N.B. This will need to be changed if the spec
-							   adopts Dave's type="include" proposal.
+			(2) @type = include
 		-->
 		<xsl:variable name="strLength">
 			<xsl:choose>
@@ -344,17 +343,17 @@
 			<!-- This grabs the the last five characters, i.e., the filename extension -->
 			<xsl:choose>
 				<xsl:when test="@url != ''">
-					<xsl:value-of select="substring(@url, $strLength - 4)"/>
+					<xsl:value-of select="translate(substring(@url, $strLength - 4), 'OPML', 'opml')"/>
 				</xsl:when>
 				<xsl:when test="@htmlUrl != ''">
-					<xsl:value-of select="substring(@htmlUrl, $strLength - 4)"/>
+					<xsl:value-of select="translate(substring(@htmlUrl, $strLength - 4), 'OPML', 'opml')"/>
 				</xsl:when>
 				<xsl:when test="@xmlUrl != ''">
-					<xsl:value-of select="substring(@xmlUrl, $strLength - 4)"/>
+					<xsl:value-of select="translate(substring(@xmlUrl, $strLength - 4), 'OPML', 'opml')"/>
 				</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:value-of select="contains($subStr, '.opml') or contains($subStr, '.OPML') or contains(@type, 'opml') or contains(@type, 'OPML')"/>
+		<xsl:value-of select="contains($subStr, '.opml') or contains(translate(@type, 'INCLUDE', 'include'), 'include')"/>
 	</xsl:template>
 	<xsl:template name="selectText">
 		<!--
