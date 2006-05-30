@@ -3,7 +3,7 @@
 Name: optimal_functions.php.inc
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.1(beta)
+Version: 0.2(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -29,8 +29,11 @@ danmactough AT yahoo DOT com
 */
 function headJS () {
 	$root = 'http://'.$_SERVER['SERVER_NAME'];
-	$imgCollapsed = $root."/img/imgCollapsed.gif";
-	$imgExpanded = $root."/img/imgExpanded.gif";
+	$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) ?
+		str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) :
+		'';
+	$imgCollapsed = $root.$path."/img/imgCollapsed.gif";
+	$imgExpanded = $root.$path."/img/imgExpanded.gif";
 
 ?>
 <script type="text/javascript">
@@ -221,6 +224,10 @@ function printForm () {
 function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML') {
 	error_reporting(0);
 
+	$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) ?
+		str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) :
+		'';
+
 	$cachefile = dirname(__FILE__).'/_cache/'.md5($url).'.'.strtolower($type).'.xml';
 	
 	$debuginfo = "<br />\n<code>\n$type URL: $url<br />\nCache file: ";
@@ -297,7 +304,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML') {
 
 	if ($type == 'OPML') {
 		$parameter_array = array (	'opmlLink' => "$url",
-									'path' => 'http://'.$_SERVER['SERVER_NAME'] );
+									'path' => 'http://'.$_SERVER['SERVER_NAME'].$path );
 	
 		if (strtolower($_GET['node']) == 'opml') {
 			$parameter_array['isNode'] = 'TRUE';
