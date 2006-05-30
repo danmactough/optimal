@@ -21,13 +21,21 @@ a:link, a:visited {
 text-decoration: none;
 }
 
-a:hover {
+a:link, .target {
+color: blue;
+}
+
+a:link:hover, a:visited:hover, .target:hover {
 text-decoration: underline;
 }
 
 img {
 border: none;
 text-decoration: none;
+}
+
+.target {
+cursor: pointer;
 }
 
 ul.main, ul.outlineList {
@@ -43,5 +51,7 @@ list-style: none outside;
 }
 
 li.outlineItemNodeSub {
-list-style: none outside;
+/*list-style: none outside;*/
+list-style-image: url(../img/indicator_arrows_circle.gif);
+list-style-position: inside;
 }

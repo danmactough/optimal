@@ -4,8 +4,6 @@
 	xmlns:str="http://exslt.org/strings"
 	extension-element-prefixes="str">
 
-<xsl:import href="xsl/str.replace.template.xsl"/>
-
 <xsl:output method="html" encoding="UTF-8" indent="yes" />
 <!--
 	This XSL Transform is written by
@@ -18,6 +16,7 @@
 	<xsl:param name="noHead"/>
 	<xsl:param name="linkTarget"/>
 	<xsl:param name="nodeRender"><xsl:value-of select="$path"/>/optimal.php</xsl:param>
+	<xsl:param name="depth"/>
 
 	<xsl:variable name="imgCollapsed"><xsl:value-of select="$path"/>/img/imgCollapsed12x12.gif</xsl:variable>
 	<xsl:variable name="imgExpanded"><xsl:value-of select="$path"/>/img/imgExpanded12x12.gif</xsl:variable>
@@ -44,13 +43,18 @@
 				</xsl:element>
 				<br />
     			<b>Author</b>: <xsl:value-of select="head/ownerName" /><br />
+				<xsl:if test="head/ownerEmail != ''">
     			<b>Email</b>: 
-    			<xsl:call-template name="str:replace">
+    			<xsl:call-template name="strReplace">
     				<xsl:with-param name="string" select="head/ownerEmail"/>
     				<xsl:with-param name="search" select="string('@')"/>
     				<xsl:with-param name="replace" select="string(' at ')"/>
     			</xsl:call-template><br />
-    			<b>Date</b>: <xsl:value-of select="head/dateModified" /><br />
+				</xsl:if>
+				<xsl:if test="head/ownerId != ''">
+				<b>Author Contact</b>: <a href="{head/ownerId}"><xsl:value-of select="head/ownerId"/></a><br />
+				</xsl:if>
+    			<b>Date</b>: <xsl:value-of select="head/dateModified"/><br />
     			<br />
     			<xsl:element name="ul">
     			    <xsl:attribute name="class">main</xsl:attribute>
@@ -72,7 +76,7 @@
 			<xsl:value-of select="generate-id(.)"/>
 		</xsl:variable>
 		<xsl:choose>
-			<xsl:when test="child::outline and (parent::body or parent::opml) and $isOPML != 'true' and not(@xmlUrl)">
+			<xsl:when test="child::outline and (count(ancestor::outline) &lt; $depth) and $isOPML != 'true' and not(@xmlUrl)">
 				<xsl:call-template name="lineItem">
 				    <xsl:with-param name="imgExpCol" select="$imgExpanded"/>
 				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>');</xsl:with-param>
@@ -160,7 +164,7 @@
 			</xsl:if>
 			<xsl:element name="span">
 				<xsl:attribute name="onclick"><xsl:value-of select="$jsCmd"/></xsl:attribute>
-				<xsl:attribute name="style">text-decoration: none; border: none;</xsl:attribute>
+				<xsl:attribute name="style">cursor: pointer; text-decoration: none; border: none;</xsl:attribute>
 				<xsl:element name="img">
 					<xsl:attribute name="name">img-<xsl:value-of select="$uniqueID"/></xsl:attribute>
 					<xsl:attribute name="src"><xsl:value-of select="$imgExpCol"/></xsl:attribute>
@@ -171,7 +175,7 @@
 			</xsl:element>
 			<xsl:element name="span">
 				<xsl:attribute name="style">
-					<xsl:text>margin-left: 6px;</xsl:text>
+					<xsl:text>margin-left: 3px;</xsl:text>
 				</xsl:attribute>
 				<xsl:call-template name="outlineItem">
 				    <xsl:with-param name="isOPML" select="$isOPML"/>
@@ -191,13 +195,13 @@
 				<xsl:choose>
 					<xsl:when test="$isOPML = 'true' or (@xmlUrl != '')">
 						<xsl:attribute name="style">
-							<xsl:text>display:none; margin-left: 18px;</xsl:text>
+							<xsl:text>display:none; margin-left: 15px;</xsl:text>
 						</xsl:attribute>
 						<xsl:element name="li">
            					<xsl:attribute name="class">
         					    <xsl:text>outlineItemNodeSub</xsl:text>
         					</xsl:attribute>
-							<xsl:text>Loading... Please wait.</xsl:text>
+							<xsl:text>Loading....</xsl:text>
 						</xsl:element>
 					</xsl:when>
 					<xsl:when test="$imgExpCol = $imgExpanded">
@@ -227,7 +231,6 @@
 		<xsl:choose>
 			<!-- Begin OPML item -->
 			<xsl:when test="$isOPML">
-				<xsl:value-of select="$displayText"/>
 				<xsl:element name="a">
 					<xsl:attribute name="href">
 						<xsl:value-of select="$opmlUrl"/>
@@ -237,8 +240,9 @@
 							<xsl:value-of select="$linkTarget"/>
 						</xsl:attribute>
 					</xsl:if>
-					<img src="{$imgOPML}" alt="Link to OPML File" title="Open OPML File" style="margin-left: 3px; text-decoration: none; border: none;"></img>
+					<img src="{$imgOPML}" alt="Link to OPML File" title="Open OPML File" style="margin-right: 3px; text-decoration: none; border: none;"></img>
 				</xsl:element>
+				<xsl:value-of select="$displayText"/>
 			</xsl:when>
 			<!-- End OPML item -->
 			<!-- Begin RSS item -->
@@ -379,6 +383,28 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<i>(Blank)</i>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template name="strReplace">
+		<xsl:param name="string"/>
+		<xsl:param name="search"/>
+		<xsl:param name="replace"/>
+		<xsl:param name="fragment"/>
+		<xsl:choose>
+			<xsl:when test="contains($string, $search)">
+				<xsl:variable name="newString">
+					<xsl:value-of select="concat(substring-before($string, $search), $replace)"/>
+				</xsl:variable>
+    			<xsl:call-template name="strReplace">
+    				<xsl:with-param name="string" select="substring-after($string, $search)"/>
+    				<xsl:with-param name="search" select="$search"/>
+    				<xsl:with-param name="replace" select="$replace"/>
+    				<xsl:with-param name="fragment" select="concat($fragment, $newString)"/>
+    			</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="concat($fragment, $string)"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>

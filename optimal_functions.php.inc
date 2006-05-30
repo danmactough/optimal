@@ -3,7 +3,7 @@
 Name: optimal_functions.php.inc
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.3b(beta)
+Version: 0.4pre1(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -38,22 +38,53 @@ function headJS () {
 ?>
 <script type="text/javascript">
 <!-- begin hiding from old browsers
+	var imgCollapsed = "<?= $imgCollapsed ?>";
+	var imgExpanded = "<?= $imgExpanded ?>";
+
+	function expandAll () {
+		var uls = document.getElementsByTagName('ul');
+		for (var i=0;i<uls.length;i++) {
+			if (uls[i].firstChild.className != 'outlineItemNodeSub') {
+				uls[i].style.display = 'block';
+				if (uls[i].className != 'main') {
+					if (document.images["img-"+uls[i].id]) {
+						document.images["img-"+uls[i].id].src=[imgExpanded];
+					}
+				}
+			}
+		}
+	}
+
+	function collapseAll () {
+		var uls = document.getElementsByTagName('ul');
+		for (var i=0;i<uls.length;i++) {
+			if (uls[i].firstChild.className != 'outlineItemNodeSub' && uls[i].className != 'main') {
+				uls[i].style.display = 'none';
+				if (document.images["img-"+uls[i].id]) {
+					document.images["img-"+uls[i].id].src=[imgCollapsed];
+				}
+			}
+		}
+	}
+
 	function opmlRenderExCol(id, isNode, url) {
 		if (isNode != null) {
 			xmlhttpGetOpml (url, id);
 		}
-		var imgCollapsed = "<?= $imgCollapsed ?>";
-		var imgExpanded = "<?= $imgExpanded ?>";
 		if (document.getElementById) {
-			var menu = document.getElementById(id);
-			var display = menu.style.display;
+			var item = document.getElementById(id);
+			var display = item.style.display;
 			if (display == "none"){
-				menu.style.display = 'block';
-				document.images["img-"+id].src=[imgExpanded];
+				item.style.display = 'block';
+				if (document.images["img-"+id]) {
+					document.images["img-"+id].src=[imgExpanded];
+				}
 				return true;
 			} else {
-				document.images["img-"+id].src=[imgCollapsed];
-				menu.style.display = 'none';
+				item.style.display = 'none';
+				if (document.images["img-"+id]) {
+					document.images["img-"+id].src=[imgCollapsed];
+				}
 				return true;
 			}	
 		} else {
@@ -146,44 +177,9 @@ function headJS () {
 <?php
 }
 
-function headCSS () {
-?>
-<style type="text/css">
-<!--
-h1 { font-size: 2.0em; font-weight: bold; margin: .25ex auto; }
-
-h1 a { color: black; }
-
-h2 { font-size: 1.8em; font-weight: bold; color: #333; margin: .25ex auto; }
-
-h2 a { color: blue; }
-
-h3 { font-size: 1.4em; font-weight: bold; color: #444; margin: .25ex auto; }
-
-h3 a { color: blue; }
-
-h4 { font-size: 1.0em; font-weight: bold;  }
-
-h4 a { color: blue; }
-
-table.formWrapper {
-	width: 36em;
-}
-td.formElement{
-	vertical-align: middle;
-}
-form.obForm {
-	width: 100%;
-	margin: 1ex auto;
-	padding: 4px 0;
-	border-bottom: 1px solid #666;
-}
--->
-</style>
-<?php
-}
-
 function nodeTreeCSS () {
+	// Pull in the css with an import
+	// And prefetch the images with JavaScript
 ?>
 <style type="text/css">
 <!--
@@ -194,6 +190,22 @@ echo str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) ?
         ''; ?>/css/optimal.css);
 -->
 </style>
+<script type="text/javascript">
+<!-- begin hiding from old browsers
+if (document.images)
+{
+<?php
+	{ // Scoping brace
+	$i = '1';
+		foreach (glob("img/*") as $filename) {
+			echo "\tpic".$i."= new Image(8,8);\n\tpic".$i.".src='".$filename."';\n";
+			$i++;
+		}
+	}
+?>
+}
+// end hiding -->
+</script>
 <?php
 }
 
@@ -203,40 +215,17 @@ function urlProper ($url) {
 	return ($url);
 }
 
-function printForm () {
-	//
-	// This is the input form
-	// 
-	global $url;
-?>
-<form class="obForm" action="<?= $PHP_SELF ?>" method="GET">
-  <table class="formWrapper">
-  	<tr>
-    <td class="formElement" style="width: 6em;">OPML URL:</td>
-    <td class="formElement" colspan="2" style="width: 24em;"><input style="border: 1px solid #999; padding-left: 1px; width: 23em;" type="text" name="url" value="<?php print htmlspecialchars($url) ?>"></td>
-    <td class="formElement" style="text-align: center;"><input style="border: 1px outset #ccc; padding: 1px; background: #ddd;" type="submit" name="submit" value="Submit"></td>
-	</tr>
-	<tr>
-	<td class="formElement" colspan="3">&nbsp;</td>
-	<td class="formElement" style="text-align: center; padding-top: 1ex;"><span style="font-size: 85%;">Standalone<br /><input type="checkbox" name="standalone" value="1"/></span></td>
-	</tr>
-	<tr>
-      <td class="formElement" colspan="2"><a href="<?= $PHP_SELF ?>?url=http://hosting.opml.org/yabfog/dailyReading.opml" title="Click here to render a sample OPML file">Render Sample OPML</a></td>
-      <td class="formElement" colspan="2" style="text-align: right; height: 4ex; vertical-align: bottom;">
-        <a href="http://www.scripting.com/" target="_blank"><img src="img/thanksdave.gif" alt="Thanks, Dave!" title="Thanks, Dave!"></a>
-      </td>
-    </tr>
-	<tr>
-      <td class="formElement" colspan="4"><a href="<?= $_SERVER['SCRIPT_NAME'] ?>?url=<?php echo htmlspecialchars(urlencode($url))?>&amp;refresh=1" title="Click here to refresh the current view">Refresh</a></td>
-	</tr>
-  </table>
-</form>
-
-<?
-}
-
-function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $isNode = '', $linkTarget = '') {
+function renderXML ($url, $flForceRefresh = FALSE, $options = array()) {
 	error_reporting(0);
+	
+	// The options array
+	$depth = $options['depth'];
+	$flIsNode = $options['flIsNode'];
+	$flNoHead = $options['flNoHead'];
+	$linkTarget = $options['linkTarget'];
+	$maxAge = $options['maxAge'] ? $options['maxAge'] : '1200' ;
+	$type = $options['type'] ? $options['type'] : 'OPML' ;
+	$xslfile = $options['xslfile'];
 
 	$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) ?
 		str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) :
@@ -249,7 +238,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 	$debuginfo .= "<br/>\n";
 
 	// Get file contents
-	if ( $forceRefresh != '1' && file_exists($cachefile) && ( filesize($cachefile) > 0 ) && ( filemtime($cachefile) > ( time() - 1200 ) ) ) {
+	if ( (!$flForceRefresh) && file_exists($cachefile) && ( filesize($cachefile) > 0 ) && ( filemtime($cachefile) > ( time() - $maxAge ) ) ) {
 		// We have a local, non-empty, recent copy, so use it
 		$xml = file_get_contents($cachefile);
 
@@ -322,20 +311,32 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 		$parameter_array = array (	'opmlLink' => "$url",
 									'path' => 'http://'.$_SERVER['SERVER_NAME'].$path );
 	
-		if ($isNode) { // strtolower($_GET['node']) == 'opml') {
+		if ($flIsNode) {
 			$parameter_array['isNode'] = 'TRUE';
 			}
 		
-		if (strtolower($_GET['nohead']) == '1') {
+		if ($flNoHead) {
 			$parameter_array['noHead'] = 'TRUE';
 			}
+
 		if ($linkTarget) {
 			$parameter_array['linkTarget'] = $linkTarget;
+		}
+
+		if ('1' > $depth) {
+			$parameter_array['depth'] = '1';
+		} else {
+			$parameter_array['depth'] = $depth;
+		}
+
+		if ($flIsNode) {
+			$parameter_array['depth'] = '0';
 		}
 	}
 
 	elseif ($type == 'RSS') {
-		$parameter_array = array ( 'path' => 'http://'.$_SERVER['SERVER_NAME'].$path );
+		$parameter_array = array ( 'path' => 'http://'.$_SERVER['SERVER_NAME'].$path,
+								   'rssLink' => 'http://'.$_SERVER['SERVER_NAME'].$path.'/_cache/'.basename($cachefile) );
 		if ($linkTarget) {
 			$parameter_array['linkTarget'] = $linkTarget;
 		}
@@ -390,7 +391,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 		unlink($cachefile); //Delete the cachefile - maybe it's corrupt.
 	}
 
-	print $result;
+	return $result;
 
 }
 ?>
