@@ -3,7 +3,7 @@
 Name: Optimal OPML Browser
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: Renders valid OPML from any source in a tree-like view. Links to external OPML files as well as RSS, RDF, and Atom feeds are expanded in place.
-Version: 0.2b(beta)
+Version: 0.3(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -39,10 +39,10 @@ if ($_GET['url']) {
 			headJS();
 			nodeTreeCSS();
 		}
-		renderXML($url, '', '', 'OPML', TRUE);
+		renderXML($url, '', '', 'OPML', TRUE, $_GET['linktarget']);
 		exit;
 	} elseif (strtolower($_GET['node']) == 'rss') {
-		renderXML($url, '', 'rssNode', 'RSS');
+		renderXML($url, '', 'rssNode', 'RSS', TRUE, $_GET['linktarget']);
 		exit;
 	}
 }
@@ -83,9 +83,9 @@ if ($_GET['refresh'] == '1' && strpos($lastReferer, $thisHost)) {
 if ($_GET['standalone'] == '1' && $url) {
 	if ($_GET['refresh'] == '1' && strpos($lastReferer, $thisHost)) {
 		echo "<!-- Forced rendering from remote server -->\n";
-    	renderXML($url, $forceRefresh = '1');
+    	renderXML($url, $forceRefresh = '1', '', 'OPML', '' , $_GET['linktarget']);
 	} else {
-    	renderXML($url);
+    	renderXML($url, '', '', 'OPML', '', $_GET['linktarget']);
 	}
 } else { ?>
 

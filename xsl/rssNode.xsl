@@ -17,6 +17,7 @@
 	Thanks to iconophobia and the inlineRSS plugin for some code and ideas.
 	http://www.iconophobia.com/wordpress/?page_id=55
 -->
+	<xsl:param name="linkTarget"/>
 
 	<xsl:template match="/rdf:RDF">
 		<xsl:apply-templates select="rss:item" />
@@ -31,6 +32,11 @@
 				<xsl:attribute name="href">
 					<xsl:value-of select="rss:link"/>
 				</xsl:attribute>
+				<xsl:if test="$linkTarget != ''">
+					<xsl:attribute name="target">
+						<xsl:value-of select="$linkTarget"/>
+					</xsl:attribute>
+				</xsl:if>
 				<xsl:value-of select="rss:title"/>
 			</xsl:element>
 		</li>
@@ -50,6 +56,11 @@
 					<xsl:attribute name="href">
 						<xsl:value-of select="link"/>
 					</xsl:attribute>
+					<xsl:if test="$linkTarget != ''">
+						<xsl:attribute name="target">
+							<xsl:value-of select="$linkTarget"/>
+						</xsl:attribute>
+					</xsl:if>
 					<xsl:value-of select="title"/>
 				</xsl:element>
 			</li>
@@ -64,9 +75,17 @@
 		<xsl:attribute name="class">
 		    <xsl:text>outlineItem</xsl:text>
 		</xsl:attribute>
-			<a href="{atom:link[substring(@rel, 1, 8)!='service.']/@href}">
+			<xsl:element name="a">
+				<xsl:attribute name="href">
+					<xsl:value-of select="atom:link[substring(@rel, 1, 8)!='service.']/@href"/>
+				</xsl:attribute>
+				<xsl:if test="$linkTarget != ''">
+					<xsl:attribute name="target">
+						<xsl:value-of select="$linkTarget"/>
+					</xsl:attribute>
+				</xsl:if>
 				<xsl:value-of select="atom:title"/>
-			</a>
+			</xsl:element>
 		</li>
 	</xsl:template>
 

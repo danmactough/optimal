@@ -16,20 +16,33 @@
 	<xsl:param name="path"/>
 	<xsl:param name="isNode"/>
 	<xsl:param name="noHead"/>
+	<xsl:param name="linkTarget"/>
 	<xsl:param name="nodeRender"><xsl:value-of select="$path"/>/optimal.php</xsl:param>
 
 	<xsl:variable name="imgCollapsed"><xsl:value-of select="$path"/>/img/imgCollapsed.gif</xsl:variable>
 	<xsl:variable name="imgExpanded"><xsl:value-of select="$path"/>/img/imgExpanded.gif</xsl:variable>
 	<xsl:variable name="imgOPMLlogo"><xsl:value-of select="$path"/>/img/opml.gif</xsl:variable>
 	<xsl:variable name="imgOPML"><xsl:value-of select="$path"/>/img/redArrow.gif</xsl:variable>
-	<xsl:variable name="imgXML"><xsl:value-of select="$path"/>/img/xmlMini.gif</xsl:variable>
+	<xsl:variable name="imgXML"><xsl:value-of select="$path"/>/img/feed-icon-12x12.gif</xsl:variable>
 
 	<xsl:template match="/opml" >
 	    <xsl:choose>
 	        <xsl:when test="$isNode = '' and $noHead = ''">
     		<xsl:element name="div">
     			<xsl:attribute name="class">outlineRoot</xsl:attribute>
-    			<b>Title</b>: <xsl:value-of select="head/title" /><xsl:text> </xsl:text><a href="{$opmlLink}"><img src="{$imgOPMLlogo}" title="OPML" alt="OPML"></img></a><br />
+    			<b>Title</b>: <xsl:value-of select="head/title" /><xsl:text> </xsl:text>
+				<xsl:element name="a">
+					<xsl:attribute name="href">
+						<xsl:value-of select="$opmlLink"/>
+					</xsl:attribute>
+					<xsl:if test="$linkTarget != ''">
+						<xsl:attribute name="target">
+							<xsl:value-of select="$linkTarget"/>
+						</xsl:attribute>
+					</xsl:if>
+					<img src="{$imgOPMLlogo}" title="OPML" alt="OPML"></img>
+				</xsl:element>
+				<br />
     			<b>Author</b>: <xsl:value-of select="head/ownerName" /><br />
     			<b>Email</b>: 
     			<xsl:call-template name="str:replace">
@@ -87,25 +100,41 @@
 						</xsl:when>
 					</xsl:choose>
 				</xsl:variable>
+				<xsl:variable name="jsQueryStr">
+					<xsl:text>url=</xsl:text>
+					<xsl:value-of select="str:encode-uri($opmlUrl, true())"/>
+					<xsl:text>&amp;node=opml</xsl:text>
+					<xsl:if test="$linkTarget != ''">
+						<xsl:text>&amp;linktarget=</xsl:text>
+						<xsl:value-of select="$linkTarget"/>
+					</xsl:if>
+				</xsl:variable>
 				<xsl:call-template name="lineItem">
 				    <xsl:with-param name="imgExpCol" select="$imgCollapsed"/>
 				    <xsl:with-param name="isOPML" select="$isOPML"/>
-				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>', 'true', '<xsl:value-of select="$nodeRender"/>?url=<xsl:value-of select="str:encode-uri($opmlUrl, true())"/>&amp;node=opml');</xsl:with-param>
+				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>', 'true', '<xsl:value-of select="$nodeRender"/>?<xsl:value-of select="$jsQueryStr"/>');</xsl:with-param>
 				    <xsl:with-param name="opmlUrl" select="$opmlUrl"/>
 				    <xsl:with-param name="uniqueID" select="$uniqueID"/>
  				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test="@xmlUrl != ''"> <!-- RSS Item -->
+				<xsl:variable name="jsQueryStr">
+					<xsl:text>url=</xsl:text>
+					<xsl:value-of select="str:encode-uri(@xmlUrl, true())"/>
+					<xsl:text>&amp;node=rss</xsl:text>
+					<xsl:if test="$linkTarget != ''">
+						<xsl:text>&amp;linktarget=</xsl:text>
+						<xsl:value-of select="$linkTarget"/>
+					</xsl:if>
+				</xsl:variable>
 				<xsl:call-template name="lineItem">
 				    <xsl:with-param name="imgExpCol" select="$imgCollapsed"/>
-				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>', 'true', '<xsl:value-of select="$nodeRender"/>?url=<xsl:value-of select="str:encode-uri(@xmlUrl, true())"/>&amp;node=rss');</xsl:with-param>
+				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>', 'true', '<xsl:value-of select="$nodeRender"/>?<xsl:value-of select="$jsQueryStr"/>');</xsl:with-param>
 				    <xsl:with-param name="uniqueID" select="$uniqueID"/>
  				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:element name="li">
-<!--					<xsl:attribute name="style">
-						<xsl:text>margin-left: 15px;</xsl:text>-->
 					<xsl:attribute name="class">
 					    <xsl:text>outlineItem</xsl:text>
 					</xsl:attribute>
@@ -125,9 +154,6 @@
 
 		<xsl:element name="li">
 			<xsl:if test="child::outline or $isOPML = 'true' or (@xmlUrl != '')">
-<!--				<xsl:attribute name="style">
-					<xsl:text>list-style: none outside;</xsl:text>
-					<xsl:text> margin-left: -1em;</xsl:text>-->
 				<xsl:attribute name="class">
 				    <xsl:text>outlineItemNode</xsl:text>
 				</xsl:attribute>
@@ -138,7 +164,6 @@
 				<xsl:element name="img">
 					<xsl:attribute name="name">img-<xsl:value-of select="$uniqueID"/></xsl:attribute>
 					<xsl:attribute name="src"><xsl:value-of select="$imgExpCol"/></xsl:attribute>
-<!--					<xsl:attribute name="style">text-decoration: none; border: none; margin-left: -4px;</xsl:attribute>-->
 					<xsl:attribute name="style">text-decoration: none; border: none;</xsl:attribute>
 					<xsl:attribute name="alt">[+/-]</xsl:attribute>
 					<xsl:attribute name="title">[+/-]</xsl:attribute>
@@ -166,7 +191,6 @@
 				<xsl:choose>
 					<xsl:when test="$isOPML = 'true' or (@xmlUrl != '')">
 						<xsl:attribute name="style">
-<!--							<xsl:text>display:none; margin-left: 15px;</xsl:text>-->
 							<xsl:text>display:none; margin-left: 15px;</xsl:text>
 						</xsl:attribute>
 						<xsl:element name="li">
@@ -204,9 +228,17 @@
 			<!-- Begin OPML item -->
 			<xsl:when test="$isOPML">
 				<xsl:value-of select="$displayText"/>
-				<a href="{$opmlUrl}">
-					<img src="{$imgOPML}" alt="Link to OPML File" title="Open OPML File" style="margin-left: 3px; text-decoration: none; border: none;"/>
-				</a>
+				<xsl:element name="a">
+					<xsl:attribute name="href">
+						<xsl:value-of select="$opmlUrl"/>
+					</xsl:attribute>
+					<xsl:if test="$linkTarget != ''">
+						<xsl:attribute name="target">
+							<xsl:value-of select="$linkTarget"/>
+						</xsl:attribute>
+					</xsl:if>
+					<img src="{$imgOPML}" alt="Link to OPML File" title="Open OPML File" style="margin-left: 3px; text-decoration: none; border: none;"></img>
+				</xsl:element>
 			</xsl:when>
 			<!-- End OPML item -->
 			<!-- Begin RSS item -->
@@ -223,12 +255,30 @@
 						</xsl:when>
 					</xsl:choose>
 				</xsl:variable>
-				<a href="{$xmlLink}"><img src="{$imgXML}" alt="XML" title="XML RSS Feed" style="margin-right: 3px; text-decoration: none; border: none;"/></a>
+				<xsl:element name="a">
+					<xsl:attribute name="href">
+						<xsl:value-of select="$xmlLink"/>
+					</xsl:attribute>
+					<xsl:if test="$linkTarget != ''">
+						<xsl:attribute name="target">
+							<xsl:value-of select="$linkTarget"/>
+						</xsl:attribute>
+					</xsl:if>
+					<img src="{$imgXML}" alt="XML" title="XML RSS Feed" style="margin-right: 3px; text-decoration: none; border: none;"></img>
+				</xsl:element>
 				<xsl:choose>
 				    <xsl:when test="$htmlLink != ''">
-            			<a href="{$htmlLink}">
+						<xsl:element name="a">
+							<xsl:attribute name="href">
+								<xsl:value-of select="$htmlLink"/>
+							</xsl:attribute>
+							<xsl:if test="$linkTarget != ''">
+								<xsl:attribute name="target">
+									<xsl:value-of select="$linkTarget"/>
+								</xsl:attribute>
+							</xsl:if>
             				<xsl:value-of select="$displayText"/>
-            			</a>
+						</xsl:element>
 				    </xsl:when>
 				    <xsl:otherwise>
 				        <xsl:value-of select="$displayText"/>
@@ -239,9 +289,17 @@
 			<!-- Begin link item -->
 			<xsl:when test="(@url != '')">
 				<xsl:variable name="urlLink" select="@url"/>
-				<a href="{$urlLink}">
-					<xsl:value-of select="$displayText"/>
-				</a>
+					<xsl:element name="a">
+						<xsl:attribute name="href">
+							<xsl:value-of select="$urlLink"/>
+						</xsl:attribute>
+						<xsl:if test="$linkTarget != ''">
+							<xsl:attribute name="target">
+								<xsl:value-of select="$linkTarget"/>
+							</xsl:attribute>
+						</xsl:if>
+						<xsl:value-of select="$displayText"/>
+					</xsl:element>
 			</xsl:when>
 			<!-- End link item -->
 			<!-- Begin other item, probably a subfolder -->

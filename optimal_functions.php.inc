@@ -3,7 +3,7 @@
 Name: optimal_functions.php.inc
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.2b(beta)
+Version: 0.3(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -235,7 +235,7 @@ function printForm () {
 <?
 }
 
-function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $isNode = '') {
+function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $isNode = '', $linkTarget = '') {
 	error_reporting(0);
 
 	$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) ?
@@ -329,6 +329,13 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $is
 		if (strtolower($_GET['nohead']) == '1') {
 			$parameter_array['noHead'] = 'TRUE';
 			}
+		if ($linkTarget) {
+			$parameter_array['linkTarget'] = $linkTarget;
+		}
+	}
+
+	if ($type == 'RSS' && $linkTarget) {
+			$parameter_array['linkTarget'] = $linkTarget;
 	}
 
 	// This is the magic that searches for the best available XSLT rendering
