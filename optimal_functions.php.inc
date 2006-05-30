@@ -3,7 +3,7 @@
 Name: optimal_functions.php.inc
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.2(beta)
+Version: 0.2a(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -221,7 +221,7 @@ function printForm () {
 <?
 }
 
-function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML') {
+function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML', $isNode = '') {
 	error_reporting(0);
 
 	$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) ?
@@ -251,6 +251,8 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML') {
 			curl_setopt($curl_handle,CURLOPT_URL,$url);
 			curl_setopt($curl_handle,CURLOPT_CONNECTTIMEOUT,10);
 			curl_setopt($curl_handle,CURLOPT_RETURNTRANSFER,1);
+			curl_setopt($curl_handle,CURLOPT_FOLLOWLOCATION, TRUE);
+			curl_setopt($curl_handle,CURLOPT_MAXREDIRS,2);
 			$xml = curl_exec($curl_handle);
 			curl_close($curl_handle);
 
@@ -306,7 +308,7 @@ function renderXML ($url, $forceRefresh = '', $xslfile = '', $type = 'OPML') {
 		$parameter_array = array (	'opmlLink' => "$url",
 									'path' => 'http://'.$_SERVER['SERVER_NAME'].$path );
 	
-		if (strtolower($_GET['node']) == 'opml') {
+		if ($isNode) { // strtolower($_GET['node']) == 'opml') {
 			$parameter_array['isNode'] = 'TRUE';
 			}
 		

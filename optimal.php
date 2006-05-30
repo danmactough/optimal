@@ -3,7 +3,7 @@
 Name: Optimal OPML Browser
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: Renders valid OPML from any source in a tree-like view. Links to external OPML files as well as RSS, RDF, and Atom feeds are expanded in place.
-Version: 0.2(beta)
+Version: 0.2a(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -35,7 +35,10 @@ require_once('optimal_functions.php.inc');
 if ($_GET['url']) {
 	$url = urlProper($_GET['url']);
 	if (strtolower($_GET['node']) == 'opml') {
-		renderXML($url);
+		if ($_GET['jsinclude'] == '1') {
+			headJS();
+		}
+		renderXML($url, '', '', 'OPML', TRUE);
 		exit;
 	} elseif (strtolower($_GET['node']) == 'rss') {
 		renderXML($url, '', 'rssNode', 'RSS');
@@ -94,7 +97,8 @@ if ($_GET['standalone'] == '1' && $url) {
 <!--
 	By Dan MacTough - www.yabfog.com
 -->
-<h4><a href="http://www.yabfog.com/wp/optimal/" title="About Optimal">About Optimal</a> - <a href="http://www.yabfog.com/wp/optimal/#download" title="Download Optimal">Download Optimal</a></h4>
+<h4><a href="http://www.yabfog.com/wp/optimal/" title="About Optimal">About Optimal</a> - <a href="http://www.yabfog.com/wp/optimal/#download" title="Download Optimal">Download Optimal</a> 
+- <a href="javascript:location.href='http://www.optimalbrowser.com/?url='+location.href" alt="Open in Optimal Bookmarklet" title="Open in Optimal Bookmarklet">Open in Optimal Bookmarklet</a></h4>
 <?php
 
 	printForm();
