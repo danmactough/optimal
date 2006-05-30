@@ -1,0 +1,47 @@
+/*
+	CSS for OPML that has been converted to HTML
+*/
+
+* { /* Global Reset */
+	font-size: 100.01%;  margin: 0; padding: 0;
+}
+
+
+html {
+	/* Reset 1em to 13px */ /* 13px / 16px = .8125 */
+	font-size: 81.25%;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+body {
+	margin: 1ex 1em;
+}
+
+a:link, a:visited {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+img {
+	border: none;
+	text-decoration: none;
+}
+
+ul.main, ul.outlineList {
+	margin-left: 15px;
+}
+
+li.outlineItem {
+margin-left: 15px;
+}
+
+li.outlineItemNode {
+list-style: none outside;
+}
+
+li.outlineItemNodeSub {
+list-style: none outside;
+}
