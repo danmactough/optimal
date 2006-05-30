@@ -3,7 +3,7 @@
 Name: optimal_functions.php.inc
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.3a(beta)
+Version: 0.3b(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL

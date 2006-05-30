@@ -287,20 +287,30 @@
 			</xsl:when>
 			<!-- End RSS item -->
 			<!-- Begin link item -->
-			<xsl:when test="(@url != '')">
-				<xsl:variable name="urlLink" select="@url"/>
-					<xsl:element name="a">
-						<xsl:attribute name="href">
-							<xsl:value-of select="$urlLink"/>
+			<!-- We try to be accomodating in detecting a link item, too -->
+            <xsl:when test="@url != '' or @htmlUrl != ''">
+				<xsl:variable name="urlLink">
+					<xsl:choose>
+						<xsl:when test="(@url != '')">
+							<xsl:value-of select="@url"/>
+						</xsl:when>
+						<xsl:when test="@htmlUrl != ''">
+							<xsl:value-of select="@htmlUrl"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:element name="a">
+					<xsl:attribute name="href">
+						<xsl:value-of select="$urlLink"/>
+					</xsl:attribute>
+					<xsl:if test="$linkTarget != ''">
+						<xsl:attribute name="target">
+							<xsl:value-of select="$linkTarget"/>
 						</xsl:attribute>
-						<xsl:if test="$linkTarget != ''">
-							<xsl:attribute name="target">
-								<xsl:value-of select="$linkTarget"/>
-							</xsl:attribute>
-						</xsl:if>
-						<xsl:value-of select="$displayText"/>
-					</xsl:element>
-			</xsl:when>
+					</xsl:if>
+					<xsl:value-of select="$displayText"/>
+				</xsl:element>
+            </xsl:when>
 			<!-- End link item -->
 			<!-- Begin other item, probably a subfolder -->
 			<xsl:otherwise>
