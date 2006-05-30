@@ -3,7 +3,7 @@
 Name: optimal_functions.php.inc
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.2a(beta)
+Version: 0.2b(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -178,6 +178,20 @@ form.obForm {
 	padding: 4px 0;
 	border-bottom: 1px solid #666;
 }
+-->
+</style>
+<?php
+}
+
+function nodeTreeCSS () {
+?>
+<style type="text/css">
+<!--
+@import url(http://<?php
+echo $_SERVER['SERVER_NAME'];
+echo str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) ?
+        str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)) :
+        ''; ?>/css/optimal.css);
 -->
 </style>
 <?php
