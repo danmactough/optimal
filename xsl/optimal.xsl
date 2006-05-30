@@ -17,18 +17,21 @@
 	<xsl:param name="linkTarget"/>
 	<xsl:param name="nodeRender"><xsl:value-of select="$path"/>/optimal.php</xsl:param>
 	<xsl:param name="depth"/>
+	<xsl:param name="mainClass"/>
+	<xsl:param name="bottomBorder"/>
 
-	<xsl:variable name="imgCollapsed"><xsl:value-of select="$path"/>/img/imgCollapsed12x12.gif</xsl:variable>
-	<xsl:variable name="imgExpanded"><xsl:value-of select="$path"/>/img/imgExpanded12x12.gif</xsl:variable>
+	<xsl:variable name="imgBlank"><xsl:value-of select="$path"/>/img/imgBlank.gif</xsl:variable>
+	<xsl:variable name="imgCollapsed"><xsl:value-of select="$path"/>/img/imgCollapsed.gif</xsl:variable>
+	<xsl:variable name="imgExpanded"><xsl:value-of select="$path"/>/img/imgExpanded.gif</xsl:variable>
 	<xsl:variable name="imgOPMLlogo"><xsl:value-of select="$path"/>/img/opml.gif</xsl:variable>
 	<xsl:variable name="imgOPML"><xsl:value-of select="$path"/>/img/redArrow.gif</xsl:variable>
 	<xsl:variable name="imgXML"><xsl:value-of select="$path"/>/img/feed-icon-12x12.gif</xsl:variable>
 
-	<xsl:template match="/opml" >
+	<xsl:template match="/opml">
 	    <xsl:choose>
-	        <xsl:when test="$isNode = '' and $noHead = ''">
+	        <xsl:when test="$isNode != 1 and $noHead != 1">
     		<xsl:element name="div">
-    			<xsl:attribute name="class">outlineRoot</xsl:attribute>
+    			<xsl:attribute name="class"><xsl:value-of select="$mainClass"/></xsl:attribute>
     			<b>Title</b>: <xsl:value-of select="head/title" /><xsl:text> </xsl:text>
 				<xsl:element name="a">
 					<xsl:attribute name="href">
@@ -62,10 +65,25 @@
     			</xsl:element>
     		</xsl:element>
 	        </xsl:when>
+	        <xsl:when test="$isNode != 1">
+        		<xsl:element name="div">
+        			<xsl:attribute name="class"><xsl:value-of select="$mainClass"/></xsl:attribute>
+    				<xsl:element name="ul">
+        			    <xsl:attribute name="class">main</xsl:attribute>
+        				<xsl:apply-templates select="body"/>
+    				</xsl:element>
+    			</xsl:element>
+	        </xsl:when>
 	        <xsl:otherwise>
 	            <xsl:apply-templates select="body"/>
 	        </xsl:otherwise>
 	    </xsl:choose>
+		<xsl:if test="$bottomBorder = 1">
+			<xsl:element name="div">
+				<xsl:attribute name="class">opmlBorder</xsl:attribute>
+				<a href="{$opmlLink}"><img src="{$imgOPMLlogo}" alt="Source OPML" title="Source OPML" class="opmlBorderLogo"/></a>
+			</xsl:element>
+		</xsl:if>
 	</xsl:template>
 	<xsl:template match="outline">
 		<xsl:variable name="isOPML">
@@ -142,6 +160,12 @@
 					<xsl:attribute name="class">
 					    <xsl:text>outlineItem</xsl:text>
 					</xsl:attribute>
+					<xsl:element name="img">
+						<xsl:attribute name="name">img-<xsl:value-of select="$uniqueID"/></xsl:attribute>
+						<xsl:attribute name="src"><xsl:value-of select="$imgBlank"/></xsl:attribute>
+						<xsl:attribute name="style">text-decoration: none; border: none; margin-right: 3px;</xsl:attribute>
+						<xsl:attribute name="alt"></xsl:attribute>
+					</xsl:element>
 					<xsl:call-template name="outlineItem"/>
 				</xsl:element>
 			</xsl:otherwise>
@@ -164,7 +188,7 @@
 			</xsl:if>
 			<xsl:element name="span">
 				<xsl:attribute name="onclick"><xsl:value-of select="$jsCmd"/></xsl:attribute>
-				<xsl:attribute name="style">cursor: pointer; text-decoration: none; border: none;</xsl:attribute>
+				<xsl:attribute name="style">cursor: pointer; text-decoration: none; border: none; margin-right: 3px;</xsl:attribute>
 				<xsl:element name="img">
 					<xsl:attribute name="name">img-<xsl:value-of select="$uniqueID"/></xsl:attribute>
 					<xsl:attribute name="src"><xsl:value-of select="$imgExpCol"/></xsl:attribute>
@@ -174,9 +198,6 @@
 				</xsl:element>
 			</xsl:element>
 			<xsl:element name="span">
-				<xsl:attribute name="style">
-					<xsl:text>margin-left: 3px;</xsl:text>
-				</xsl:attribute>
 				<xsl:call-template name="outlineItem">
 				    <xsl:with-param name="isOPML" select="$isOPML"/>
 				    <xsl:with-param name="opmlUrl" select="$opmlUrl"/>
@@ -195,7 +216,7 @@
 				<xsl:choose>
 					<xsl:when test="$isOPML = 'true' or (@xmlUrl != '')">
 						<xsl:attribute name="style">
-							<xsl:text>display:none; margin-left: 15px;</xsl:text>
+							<xsl:text>display:none;</xsl:text>
 						</xsl:attribute>
 						<xsl:element name="li">
            					<xsl:attribute name="class">

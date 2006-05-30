@@ -3,7 +3,7 @@
 Name: Optimal OPML Browser
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: Renders valid OPML from any source in a tree-like view. Links to external OPML files as well as RSS, RDF, and Atom feeds are expanded in place.
-Version: 0.4pre1(beta)
+Version: 0.4(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -29,9 +29,10 @@ danmactough AT yahoo DOT com
 */
 
 //
-// Bring in the functions
+// Instantiate the class
 //
-require_once('optimal_functions.php.inc');
+require_once('class.optimal.php');
+$optimal = new optimal;
 
 //
 // Define some initial variables
@@ -41,7 +42,7 @@ $thisHost = $_SERVER['HTTP_HOST'];
 $lastReferer = $_SERVER['HTTP_REFERER'];
 
 //// From query string
-$url = urlProper($_GET['url']);
+$url = $optimal->url_decode_no_spaces($_GET['url']);
 $linkTarget = $_GET['linktarget'];
 if ('opml' == strtolower($_GET['node'])) {
 	$nodeType = 'opml';
@@ -54,26 +55,26 @@ $depth = $_GET['depth'];
 //
 $flForceJS = ('1' == $_GET['jsinclude']) ? TRUE : FALSE;
 $flForceRefresh = ('1' == $_GET['refresh'] && strpos($lastReferer, $thisHost)) ? TRUE : FALSE;
-$flIsNode = $nodeType ? TRUE : FALSE; // (strtolower($_GET['node']) == 'opml' || strtolower($_GET['node']) == 'rss') ? TRUE : FALSE;
+$flIsNode = isset($nodeType) ? TRUE : FALSE; // (strtolower($_GET['node']) == 'opml' || strtolower($_GET['node']) == 'rss') ? TRUE : FALSE;
 $flNoHead = ('1' == $_GET['nohead']) ? TRUE : FALSE;
 $flStandalone = ('1' == $_GET['standalone'])  ? TRUE : FALSE;
 
 //
 // Program flow and logic
 //
-//// If this is a node inclusion, render is and terminate the script
+//// If this is a node inclusion, render it and terminate the script
 if ($flIsNode && $url) {
 	if ('opml' == $nodeType) {
 		if ($flForceJS) {
-			headJS();
-			nodeTreeCSS();
+			$optimal->printHeadJavaScript();
+			$optimal->printNodeTreeCSS();
 		}
 		/*print renderXML($url, '', '', 'OPML', TRUE, $target);*/
-		print renderXML($url, '', array ('type' => 'OPML', 'flIsNode' => $flIsNode, 'linkTarget' => $linkTarget, 'flNohead' => $flNoHead, 'depth' => $depth));
+		print $optimal->renderXML($url, '', array ('type' => 'OPML', 'flIsNode' => $flIsNode, 'linkTarget' => $linkTarget, 'flNoHead' => $flNoHead, 'depth' => $depth));
 		exit;
 	} elseif ('rss' == $nodeType) {
 		/*print renderXML($url, '', 'rssNode', 'RSS', TRUE, $target);*/
-		print renderXML($url, '', array ('xslfile' => 'rssNode', 'type' => 'RSS', 'flIsNode' => $flIsNode, 'linkTarget' => $linkTarget, 'flNohead' => $flNoHead, 'depth' => $depth));
+		print $optimal->renderXML($url, '', array ('xslfile' => 'rssNode', 'type' => 'RSS', 'flIsNode' => $flIsNode, 'linkTarget' => $linkTarget, 'flNoHead' => $flNoHead, 'depth' => $depth));
 		exit;
 	}
 }
@@ -103,12 +104,46 @@ if ($flForceRefresh) {
 
 <?php 
 
-	headJS();
-	nodeTreeCSS();
+	$optimal->printHeadJavaScript();
 	
 	if (!$flStandalone) { ?>
 	<style type="text/css">
 	<!--
+	* { /* Global Reset */
+	font-size: 100.01%;  margin: 0; padding: 0;
+	}
+	
+	html {
+	/* Reset 1em to 13px */ /* 13px / 16px = .8125 */
+	font-size: 81.25%;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	}
+	
+	body {
+	margin: 1ex 1em;
+	}
+	
+	a:link, a:visited {
+	text-decoration: none;
+	}
+	
+	a:link, .target {
+	color: blue;
+	}
+	
+	a:link:hover, a:visited:hover, .target:hover {
+	text-decoration: underline;
+	}
+	
+	.target {
+	cursor: pointer;
+	}
+	
+	img {
+	border: none;
+	text-decoration: none;
+	}
+
 	h1 { font-size: 2.0em; font-weight: bold; margin: .25ex auto; }
 	
 	h1 a:link, h1 a:visited, h1 a:hover, h1 a:link:hover {
@@ -136,23 +171,22 @@ if ($flForceRefresh) {
 	-->
 	</style><?php
 		echo "\n";
-	} ?>
+	}
+
+	$optimal->printNodeTreeCSS();
+
+	?>
 <title><?php echo $url ? "Optimal &raquo; ".$url : 'Optimal'; ?></title>
 </head>
 <body>
 <?php
 
-	if (!$flStandalone) { ?>
+	if (!$flStandalone) {
 	
-<h1><a href="http://www.optimalbrowser.com/">Optimal</a></h1>
-<h3>An OPML Browser</h3>
-<!--
-	By Dan MacTough - www.yabfog.com
--->
-<h4><a href="http://www.yabfog.com/wp/optimal/" title="About Optimal">About Optimal</a> - 
-<a href="http://www.yabfog.com/wp/optimal/#download" title="Download Optimal">Download Optimal</a> - 
-<a href="javascript:location.href='http://www.optimalbrowser.com/?url='+location.href" alt="Open in Optimal Bookmarklet" title="Open in Optimal Bookmarklet">Open in Optimal Bookmarklet</a></h4>
-
+	if (file_exists('optimal.bodyintro.inc'))
+		include_once('optimal.bodyintro.inc');
+	?>
+	
 <form class="obForm" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="GET">
   <table class="formWrapper">
   	<tr>
@@ -180,15 +214,13 @@ if ($flForceRefresh) {
 	}
 
 	if ($url) {
-		// Don't need a back link any more
-		// echo '<a href="javascript:history.back();">&#171; Go Back</a><br />'."\n";
 		echo '<span style="font-size: 87%;">[ <span onclick="javascript:expandAll();" class="target">Expand All</span> | <span onclick="javascript:collapseAll();" class="target">Collapse All</span> ]</span><br />';
 		
 		if ($flForceRefresh) {
 			echo "<!-- Forced rendering from remote server -->\n";
-			print renderXML($url, $flForceRefresh, array ('type' => 'OPML', 'linkTarget' => $linkTarget, 'flNohead' => $flNoHead, 'depth' => $depth));
+			print $optimal->renderXML($url, $flForceRefresh, array ('type' => 'OPML', 'linkTarget' => $linkTarget, 'flNoHead' => $flNoHead, 'depth' => $depth));
 		} else {
-			print renderXML($url, '', array ('type' => 'OPML', 'linkTarget' => $linkTarget, 'flNohead' => $flNoHead, 'depth' => $depth));
+			print $optimal->renderXML($url, '', array ('type' => 'OPML', 'linkTarget' => $linkTarget, 'flNoHead' => $flNoHead, 'depth' => $depth));
 		}
 	}
 ?>
