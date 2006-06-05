@@ -20,9 +20,10 @@
 	<xsl:param name="mainClass"/>
 	<xsl:param name="bottomBorder"/>
 
-	<xsl:variable name="imgBlank"><xsl:value-of select="$path"/>/img/imgBlank.gif</xsl:variable>
+	<xsl:variable name="imgCircle"><xsl:value-of select="$path"/>/img/indicator_arrows_circle.gif</xsl:variable>
 	<xsl:variable name="imgCollapsed"><xsl:value-of select="$path"/>/img/imgCollapsed.gif</xsl:variable>
 	<xsl:variable name="imgExpanded"><xsl:value-of select="$path"/>/img/imgExpanded.gif</xsl:variable>
+	<xsl:variable name="imgNosubs"><xsl:value-of select="$path"/>/img/imgNosubs.gif</xsl:variable>
 	<xsl:variable name="imgOPMLlogo"><xsl:value-of select="$path"/>/img/opml.gif</xsl:variable>
 	<xsl:variable name="imgOPML"><xsl:value-of select="$path"/>/img/redArrow.gif</xsl:variable>
 	<xsl:variable name="imgXML"><xsl:value-of select="$path"/>/img/feed-icon-12x12.gif</xsl:variable>
@@ -161,7 +162,7 @@
 					    <xsl:text>outlineItem</xsl:text>
 					</xsl:attribute>
 					<xsl:element name="img">
-						<xsl:attribute name="src"><xsl:value-of select="$imgBlank"/></xsl:attribute>
+						<xsl:attribute name="src"><xsl:value-of select="$imgNosubs"/></xsl:attribute>
 						<xsl:attribute name="style">text-decoration: none; border: none; margin-right: 3px;</xsl:attribute>
 						<xsl:attribute name="alt"></xsl:attribute>
 					</xsl:element>
@@ -222,7 +223,7 @@
         					    <xsl:text>outlineItemNodeSub</xsl:text>
         					</xsl:attribute>
 							<xsl:element name="img">
-								<xsl:attribute name="src"><xsl:value-of select="$imgBlank"/></xsl:attribute>
+								<xsl:attribute name="src"><xsl:value-of select="$imgCircle"/></xsl:attribute>
 								<xsl:attribute name="style">text-decoration: none; border: none; margin-right: 3px;</xsl:attribute>
 								<xsl:attribute name="alt"></xsl:attribute>
 							</xsl:element>

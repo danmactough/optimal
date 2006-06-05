@@ -410,15 +410,19 @@ class optimal {
 	padding: 0;
 	}
 	li.outlineItem {
-	list-style: none inside;
-	background: transparent url(<?php echo $absuripath; ?>/img/imgNosubs.gif) no-repeat center left;
+	list-style: none outside;
+	margin-left: 0px;
+	text-indent: -15px;
 	}
 	li.outlineItemNode {
 	list-style: none outside;
+	margin-left: 0px;
+	text-indent: -15px;
 	}
 	li.outlineItemNodeSub {
-	list-style: none inside;
-	background: transparent url(<?php echo $absuripath; ?>/img/indicator_arrows_circle.gif) no-repeat center left;
+	list-style: none outside;
+	margin-left: 0px;
+	text-indent: -15px;
 	}
 	li.outlineItemErrors {
 	list-style: none outside;
