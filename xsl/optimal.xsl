@@ -161,7 +161,6 @@
 					    <xsl:text>outlineItem</xsl:text>
 					</xsl:attribute>
 					<xsl:element name="img">
-						<xsl:attribute name="name">img-<xsl:value-of select="$uniqueID"/></xsl:attribute>
 						<xsl:attribute name="src"><xsl:value-of select="$imgBlank"/></xsl:attribute>
 						<xsl:attribute name="style">text-decoration: none; border: none; margin-right: 3px;</xsl:attribute>
 						<xsl:attribute name="alt"></xsl:attribute>
@@ -222,6 +221,11 @@
            					<xsl:attribute name="class">
         					    <xsl:text>outlineItemNodeSub</xsl:text>
         					</xsl:attribute>
+							<xsl:element name="img">
+								<xsl:attribute name="src"><xsl:value-of select="$imgBlank"/></xsl:attribute>
+								<xsl:attribute name="style">text-decoration: none; border: none; margin-right: 3px;</xsl:attribute>
+								<xsl:attribute name="alt"></xsl:attribute>
+							</xsl:element>
 							<xsl:text>Loading....</xsl:text>
 						</xsl:element>
 					</xsl:when>

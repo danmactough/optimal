@@ -411,14 +411,14 @@ class optimal {
 	}
 	li.outlineItem {
 	list-style: none inside;
-	background: transparent url(<?php echo $absuripath; ?>/img/imgNosubs.gif) no-repeat top left;
+	background: transparent url(<?php echo $absuripath; ?>/img/imgNosubs.gif) no-repeat center left;
 	}
 	li.outlineItemNode {
 	list-style: none outside;
 	}
 	li.outlineItemNodeSub {
-	list-style-image: url(<?php echo $absuripath; ?>/img/indicator_arrows_circle.gif);
-	list-style-position: inside;
+	list-style: none inside;
+	background: transparent url(<?php echo $absuripath; ?>/img/indicator_arrows_circle.gif) no-repeat center left;
 	}
 	li.outlineItemErrors {
 	list-style: none outside;
