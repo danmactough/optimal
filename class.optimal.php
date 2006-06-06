@@ -33,6 +33,7 @@ class optimal {
 	var $basefilepath;
 	var $baseuripath;
 	var $relpath;
+	var $mainID;
 
 	var $errors = array();
 
@@ -134,9 +135,12 @@ class optimal {
 	function renderXML ($url, $flForceRefresh = FALSE, $options = array()) {
 		/*    This is the main method.    */
 		error_reporting(0);
+		if (!$this->mainID)
+			$this->mainID = uniqid('optimal-');
+
 		
 		// The options array
-		$depth = $options['depth'];
+		$depth = NULL !== $options['depth'] ? $options['depth'] : 1;
 		$flIsNode = $options['flIsNode'];
 		$flNoHead = $options['flNoHead'];
 		$linkTarget = $options['linkTarget'];
@@ -146,12 +150,12 @@ class optimal {
 		$type = $options['type'] ? $options['type'] : 'OPML' ;
 		$xslfile = $options['xslfile'];
 		// Select and read the XSL file
-		if ($xslfile && file_exists(dirname(__FILE__).'/xsl/'.$xslfile.'.xsl')) {
-			$xsl = @file_get_contents(dirname(__FILE__).'/xsl/'.$xslfile.'.xsl');
-		} elseif ($_GET['xslfile'] && file_exists(dirname(__FILE__).'/xsl/'.$_GET['xslfile'].'.xsl')) {
-			$xsl = @file_get_contents(dirname(__FILE__).'/xsl/'.$_GET['xslfile'].'.xsl');
+		if ($xslfile && file_exists($this->basefilepath.$this->relpath.'/xsl/'.$xslfile.'.xsl')) {
+			$xsl = @file_get_contents($this->basefilepath.$this->relpath.'/xsl/'.$xslfile.'.xsl');
+		} elseif ($_GET['xslfile'] && file_exists($this->basefilepath.$this->relpath.'/xsl/'.$_GET['xslfile'].'.xsl')) {
+			$xsl = @file_get_contents($this->basefilepath.$this->relpath.'/xsl/'.$_GET['xslfile'].'.xsl');
 		} else {
-			$xsl = @file_get_contents(dirname(__FILE__).'/xsl/optimal.xsl');
+			$xsl = @file_get_contents($this->basefilepath.$this->relpath.'/xsl/optimal.xsl');
 		}
 	
 		if (empty($xsl))  {
@@ -170,7 +174,7 @@ class optimal {
 			$flIsLocal = FALSE;
 		}
 
-		$this->_cachefile = dirname(__FILE__).'/_cache/'.md5($url).'.'.strtolower($type).'.xml';
+		$this->_cachefile = $this->basefilepath.$this->relpath.'/_cache/'.md5($url).'.'.strtolower($type).'.xml';
 
 		$this->debuginfo = "<br/>$type URL: <a href=\"$url\">$url</a><br/>\nCache file: ";
 		$this->debuginfo .= $this->_cachefile ? '<a href="'.$this->relpath.'/_cache/'.basename($this->_cachefile).'">'.basename($this->_cachefile).'</a>' : "None";
@@ -200,7 +204,9 @@ class optimal {
 		// Prepare XSL parameters
 		if ($type == 'OPML') {
 			$parameter_array = array (	'opmlLink' => "$url",
-										'path' => 'http://'.$_SERVER['SERVER_NAME'].$this->relpath );
+										'path' => $this->baseuripath.$this->relpath,
+										'mainID' => $this->mainID,
+										'depth' => $depth );
 			if ($flIsNode) {
 				$parameter_array['isNode'] = TRUE;
 				}
@@ -216,17 +222,12 @@ class optimal {
 			if ($flBottomBorder) {
 				$parameter_array['bottomBorder'] = TRUE;
 			}
-			if ('1' > $depth) {
-				$parameter_array['depth'] = '1';
-			} else {
-				$parameter_array['depth'] = $depth;
-			}
 			if ($flIsNode) {
 				$parameter_array['depth'] = '0';
 			}
 		} elseif ($type == 'RSS') {
-			$parameter_array = array ( 'path' => 'http://'.$_SERVER['SERVER_NAME'].$this->relpath,
-									   'rssLink' => 'http://'.$_SERVER['SERVER_NAME'].$this->relpath.'/_cache/'.basename($this->_cachefile) );
+			$parameter_array = array ( 'path' => $this->baseuripath.$this->relpath,
+									   'rssLink' => $this->baseuripath.$this->relpath.'/_cache/'.basename($this->_cachefile) );
 			if ($linkTarget) {
 				$parameter_array['linkTarget'] = $linkTarget;
 			}
@@ -260,30 +261,53 @@ class optimal {
 	var imgCollapsed = "<?php echo $imgCollapsed; ?>";
 	var imgExpanded = "<?php echo $imgExpanded; ?>";
 
-	function expandAll () {
-		var uls = document.getElementsByTagName('ul');
+	function expandAll (id) {
+		var uls = new Array();
+		var nodeCollection = document.getElementById(id).childNodes;
+		for (var i=0;i<nodeCollection.length;i++) {
+			if (nodeCollection[i].nodeType == 1) {
+				uls = uls.concat(getULsRecursive(nodeCollection[i]));
+			}
+		}
 		for (var i=0;i<uls.length;i++) {
-			if (uls[i].firstChild.className != 'outlineItemNodeSub') {
+			if (uls[i].firstChild.className != 'outlineItemNodeSub' && uls[i].className != 'flashmp3') {
 				uls[i].style.display = 'block';
-				if (uls[i].className != 'main') {
-					if (document.images["img-"+uls[i].id]) {
-						document.images["img-"+uls[i].id].src=[imgExpanded];
-					}
+				if (document.images["img-"+uls[i].id]) {
+					document.images["img-"+uls[i].id].src=[imgExpanded];
 				}
 			}
 		}
 	}
 
-	function collapseAll () {
-		var uls = document.getElementsByTagName('ul');
+	function collapseAll (id) {
+		var uls = new Array();
+		var nodeCollection = document.getElementById(id).childNodes;
+		for (var i=0;i<nodeCollection.length;i++) {
+			if (nodeCollection[i].nodeType == 1) {
+				uls = uls.concat(getULsRecursive(nodeCollection[i]));
+			}
+		}
 		for (var i=0;i<uls.length;i++) {
-			if (uls[i].firstChild.className != 'outlineItemNodeSub' && uls[i].className != 'main') {
+			if (uls[i].firstChild.className != 'outlineItemNodeSub') {
 				uls[i].style.display = 'none';
 				if (document.images["img-"+uls[i].id]) {
 					document.images["img-"+uls[i].id].src=[imgCollapsed];
 				}
 			}
 		}
+	}
+
+	function getULsRecursive (node) {
+		var uls = new Array();
+		if (node.nodeName == 'UL') {
+			uls.push(node);
+		}
+		if (node.childNodes) {
+			for (var i=0;i<node.childNodes.length;i++) {
+				uls = uls.concat(getULsRecursive(node.childNodes[i]));
+			}
+		}
+		return uls;
 	}
 
 	function opmlRenderExCol(id, isNode, url) {
@@ -399,15 +423,16 @@ class optimal {
 		if (!$absuripath) {
 			$absuripath = $this->baseuripath.$this->relpath;
 		}
-		// Pull in the css with an import
-		// And prefetch the images with JavaScript
-		$cssfile = $absuripath.'/css/optimal.css';
 	?>
 	<style type="text/css">
 	<!--
 	ul.main, ul.outlineList, ul.flashmp3 {
 	margin-left: 15px;
 	padding: 0;
+	}
+	.outlineRoot img, ul.main img {
+	border: none;
+	text-decoration: none;
 	}
 	li.outlineItem {
 	list-style: none outside;
@@ -428,12 +453,29 @@ class optimal {
 	list-style: none outside;
 	margin-left: 15px;
 	}
+	.optimalAllExpandCollapse {
+	margin: 3ex 0 0;
+	padding: 0;
+	font-size: 87%;
+	}
 	.optimalTarget {
 	color: blue;
 	cursor: pointer;
 	}
 	.optimalTarget:hover {
 	text-decoration: underline;
+	}
+	.optimalSourceLink {
+	margin: 0 0 3ex;
+	padding: 0;
+	border-top: 1px solid #ddd;
+	}
+	.optimalSourceLink a, .optimalSourceLink img {
+	border: none;
+	text-decoration: none;
+	}
+	.optimalSourceLink img {
+	float: right;
 	}
 	-->
 	</style>
@@ -457,5 +499,15 @@ class optimal {
 	<?php
 	} // End function printNodeTreeCSS
 
+	function genAllExpandCollapse ($class = 'optimalAllExpandCollapse') {
+		$this->mainID = uniqid('optimal-');
+		$str = '<div class="'.$class.'">[ <span onclick="javascript:expandAll(\''.$this->mainID.'\');" class="optimalTarget">Expand All</span> | <span onclick="javascript:collapseAll(\''.$this->mainID.'\');" class="optimalTarget">Collapse All</span> ]</div>'."\n";
+		return ($str);
+	}
+
+	function genOutlineLink ($url, $class = 'optimalSourceLink') {
+		$str = '<div class="'.$class.'"><a href="'.$url.'"><img src="'.$this->baseuripath.$this->relpath.'/img/opml.gif" alt="Source OPML" title="Source OPML"/></a></div>'."\n";
+		return ($str);
+	}
 } // End class optimal
 ?>

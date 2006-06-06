@@ -17,6 +17,7 @@
 	<xsl:param name="linkTarget"/>
 	<xsl:param name="nodeRender"><xsl:value-of select="$path"/>/optimal.php</xsl:param>
 	<xsl:param name="depth"/>
+	<xsl:param name="mainID"/>
 	<xsl:param name="mainClass"/>
 	<xsl:param name="bottomBorder"/>
 
@@ -62,6 +63,7 @@
     			<br />
     			<xsl:element name="ul">
     			    <xsl:attribute name="class">main</xsl:attribute>
+    			    <xsl:attribute name="id"><xsl:value-of select="$mainID"/></xsl:attribute>
     				<xsl:apply-templates select="body"/>
     			</xsl:element>
     		</xsl:element>
@@ -71,6 +73,7 @@
         			<xsl:attribute name="class"><xsl:value-of select="$mainClass"/></xsl:attribute>
     				<xsl:element name="ul">
         			    <xsl:attribute name="class">main</xsl:attribute>
+        			    <xsl:attribute name="id"><xsl:value-of select="$mainID"/></xsl:attribute>
         				<xsl:apply-templates select="body"/>
     				</xsl:element>
     			</xsl:element>

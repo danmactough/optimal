@@ -127,16 +127,12 @@ if ($flForceRefresh) {
 	text-decoration: none;
 	}
 	
-	a:link, .target {
+	a:link {
 	color: blue;
 	}
 	
-	a:link:hover, a:visited:hover, .target:hover {
+	a:link:hover, a:visited:hover{
 	text-decoration: underline;
-	}
-	
-	.target {
-	cursor: pointer;
 	}
 	
 	img {
@@ -214,8 +210,8 @@ if ($flForceRefresh) {
 	}
 
 	if ($url) {
-		echo '<span style="font-size: 87%;">[ <span onclick="javascript:expandAll();" class="target">Expand All</span> | <span onclick="javascript:collapseAll();" class="target">Collapse All</span> ]</span><br />';
-		
+		print $optimal->genAllExpandCollapse();
+
 		if ($flForceRefresh) {
 			echo "<!-- Forced rendering from remote server -->\n";
 			print $optimal->renderXML($url, $flForceRefresh, array ('type' => 'OPML', 'linkTarget' => $linkTarget, 'flNoHead' => $flNoHead, 'depth' => $depth));
