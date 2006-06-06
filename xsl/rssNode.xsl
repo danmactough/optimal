@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<xsl:stylesheet exclude-result-prefixes="rdf enc rss atom atom10 dc admin l content xsl"
+<xsl:stylesheet  exclude-result-prefixes="xsl rdf rdf09 rss enc atom atom10 dc admin l content"
   version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                xmlns:enc="http://purl.oclc.org/net/rss_2.0/enc#"
+                xmlns:rdf09="http://my.netscape.com/rdf/simple/0.9/"
                 xmlns:rss="http://purl.org/rss/1.0/"
+                xmlns:enc="http://purl.oclc.org/net/rss_2.0/enc#"
                 xmlns:atom="http://purl.org/atom/ns#"
                 xmlns:atom10="http://www.w3.org/2005/Atom"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -34,11 +35,25 @@
     <!-- RSS 1.0/RDF -->
 	<xsl:template match="/rdf:RDF">
 		<xsl:apply-templates select="rss:item" />
+		<xsl:apply-templates select="rdf09:item" />
 	</xsl:template>
 	<xsl:template match="rss:item">
 	    <xsl:call-template name="rssItem">
 	        <xsl:with-param name="title"><xsl:value-of select="./rss:title"/></xsl:with-param>
 	        <xsl:with-param name="link"><xsl:value-of select="./rss:link"/></xsl:with-param>
+	        <xsl:with-param name="encLink">
+				<xsl:choose>
+					<xsl:when test="contains(enc:enclosure/enc:Enclosure/enc:type, 'audio/mpeg')">
+						<xsl:value-of select="enc:enclosure/enc:Enclosure/enc:url"/>
+					</xsl:when>
+				</xsl:choose>
+	        </xsl:with-param>
+	    </xsl:call-template>
+	</xsl:template>
+	<xsl:template match="rdf09:item">
+	    <xsl:call-template name="rssItem">
+	        <xsl:with-param name="title"><xsl:value-of select="./rdf09:title"/></xsl:with-param>
+	        <xsl:with-param name="link"><xsl:value-of select="./rdf09:link"/></xsl:with-param>
 	        <xsl:with-param name="encLink">
 				<xsl:choose>
 					<xsl:when test="contains(enc:enclosure/enc:Enclosure/enc:type, 'audio/mpeg')">

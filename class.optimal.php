@@ -70,6 +70,7 @@ class optimal {
 			// We have curl
 			$curl_handle=curl_init();
 			curl_setopt($curl_handle,CURLOPT_URL,$url);
+			curl_setopt($curl_handle,CURLOPT_USERAGENT,"Optimal/0.4");
 			curl_setopt($curl_handle,CURLOPT_CONNECTTIMEOUT,10);
 			curl_setopt($curl_handle,CURLOPT_RETURNTRANSFER,1);
 			curl_setopt($curl_handle,CURLOPT_FOLLOWLOCATION, TRUE);
@@ -243,7 +244,7 @@ class optimal {
 			return $xslt_result;
 		} else {
 			unlink($this->_cachefile); //Delete the cachefile - maybe it's corrupt.
-			$this->errors[] = "Could not apply the XSL transform to the file, probably because the file was not valid XML";
+			$this->errors[] = "Could not apply the XSL transform to the file, probably because the file was not valid XML or because the remote server returned an unexpected error instead of the requested page.";
 			return $this->_error_messages();
 		}
 		return false; // This should never be reached
