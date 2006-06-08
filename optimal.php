@@ -41,23 +41,36 @@ $optimal = new optimal;
 $thisHost = $_SERVER['HTTP_HOST'];
 $lastReferer = $_SERVER['HTTP_REFERER'];
 
-//// From query string
-$url = $optimal->url_decode_no_spaces($_GET['url']);
-$linkTarget = $_GET['linktarget'];
-if ('opml' == strtolower($_GET['node'])) {
-	$nodeType = 'opml';
-	} elseif ('rss' == strtolower($_GET['node'])) {
-	$nodeType = 'rss';
-}
-$depth = $_GET['depth'];
-//
-// Set some flags
-//
-$flForceJS = ('1' == $_GET['jsinclude']) ? TRUE : FALSE;
-$flForceRefresh = ('1' == $_GET['refresh'] && strpos($lastReferer, $thisHost)) ? TRUE : FALSE;
-$flIsNode = isset($nodeType) ? TRUE : FALSE; // (strtolower($_GET['node']) == 'opml' || strtolower($_GET['node']) == 'rss') ? TRUE : FALSE;
-$flNoHead = ('1' == $_GET['nohead']) ? TRUE : FALSE;
-$flStandalone = ('1' == $_GET['standalone'])  ? TRUE : FALSE;
+//// If widget is passed via the query string, bypass the remainder of settings
+if ($_GET['widget']) {
+	$url = $optimal->url_decode_no_spaces($_GET['url']);
+	$linkTarget = $_GET['linktarget'] ? $_GET['linktarget'] : '_blank'; // default to opening a new window
+	$depth = $_GET['depth'] ? $_GET['depth'] : 0;
+	$flForceJS = FALSE;
+	$flForceRefresh = FALSE;
+	$flIsNode = FALSE;
+	$flNoHead = TRUE;
+	$flStandalone = TRUE;
+	$flIsWidget = TRUE;
+} else {
+	//// From query string
+	$url = $optimal->url_decode_no_spaces($_GET['url']);
+	$linkTarget = $_GET['linktarget'];
+	if ('opml' == strtolower($_GET['node'])) {
+		$nodeType = 'opml';
+		} elseif ('rss' == strtolower($_GET['node'])) {
+		$nodeType = 'rss';
+	}
+	$depth = $_GET['depth'];
+	//
+	// Set some flags
+	//
+	$flForceJS = ('1' == $_GET['jsinclude']) ? TRUE : FALSE;
+	$flForceRefresh = ('1' == $_GET['refresh'] && strpos($lastReferer, $thisHost)) ? TRUE : FALSE;
+	$flIsNode = isset($nodeType) ? TRUE : FALSE; // (strtolower($_GET['node']) == 'opml' || strtolower($_GET['node']) == 'rss') ? TRUE : FALSE;
+	$flNoHead = ('1' == $_GET['nohead']) ? TRUE : FALSE;
+	$flStandalone = ('1' == $_GET['standalone'])  ? TRUE : FALSE;
+} // End of the widget bypass
 
 //
 // Program flow and logic
@@ -167,6 +180,46 @@ if ($flForceRefresh) {
 	-->
 	</style><?php
 		echo "\n";
+	}
+	
+	if ($flIsWidget) { ?>
+	<style type="text/css">
+	<!--
+	* { /* Global Reset */
+	font-size: 100.01%;  margin: 0; padding: 0;
+	}
+	
+	html {
+	/* Reset 1em to 11px */
+	font-size: 68.75%;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	}
+	
+	body {
+	margin: -3ex 0.5em 0 0;
+	padding-top: 2px;
+	}
+	
+	a:link, a:visited {
+	text-decoration: none;
+	}
+	
+	a:link {
+	color: blue;
+	}
+	
+	a:link:hover, a:visited:hover{
+	text-decoration: underline;
+	}
+	
+	img {
+	border: none;
+	text-decoration: none;
+	}
+	-->
+	</style><?php
+		echo "\n";
+	
 	}
 
 	$optimal->printNodeTreeCSS();

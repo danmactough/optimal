@@ -40,6 +40,19 @@
 	<xsl:template match="rss:item">
 	    <xsl:call-template name="rssItem">
 	        <xsl:with-param name="title"><xsl:value-of select="./rss:title"/></xsl:with-param>
+	        <xsl:with-param name="description">
+	            <xsl:choose>
+    	            <xsl:when test="content:encoded">
+            	        <xsl:value-of select="content:encoded"/>
+    	            </xsl:when>
+    	            <xsl:when test="dc:content">
+            	        <xsl:value-of select="dc:content"/>
+    	            </xsl:when>
+        	        <xsl:otherwise>
+            	        <xsl:value-of select="./rss:description"/>
+        	        </xsl:otherwise>
+    	        </xsl:choose>
+	        </xsl:with-param>
 	        <xsl:with-param name="link"><xsl:value-of select="./rss:link"/></xsl:with-param>
 	        <xsl:with-param name="encLink">
 				<xsl:choose>
@@ -53,6 +66,19 @@
 	<xsl:template match="rdf09:item">
 	    <xsl:call-template name="rssItem">
 	        <xsl:with-param name="title"><xsl:value-of select="./rdf09:title"/></xsl:with-param>
+	        <xsl:with-param name="description">
+	            <xsl:choose>
+    	            <xsl:when test="content:encoded">
+            	        <xsl:value-of select="content:encoded"/>
+    	            </xsl:when>
+    	            <xsl:when test="dc:content">
+            	        <xsl:value-of select="dc:content"/>
+    	            </xsl:when>
+        	        <xsl:otherwise>
+            	        <xsl:value-of select="./rdf09:description"/>
+        	        </xsl:otherwise>
+    	        </xsl:choose>
+	        </xsl:with-param>
 	        <xsl:with-param name="link"><xsl:value-of select="./rdf09:link"/></xsl:with-param>
 	        <xsl:with-param name="encLink">
 				<xsl:choose>
@@ -71,24 +97,19 @@
 	<xsl:template match="channel">	    
 		<xsl:for-each select="item">
     	    <xsl:call-template name="rssItem">
-    	        <xsl:with-param name="title">
-    	            <!-- Only one of title or description is a required element -->
-					<xsl:choose>
-						<xsl:when test="title != ''">
-							<xsl:value-of select="title"/>
-						</xsl:when>
-						<xsl:when test="description != ''">
-							<xsl:value-of select="description"/>
-						</xsl:when>
-						<xsl:otherwise>[No title or description]</xsl:otherwise>
-					</xsl:choose>
-    	        </xsl:with-param>
-    	        <xsl:with-param name="titleIsMarkup">
-					<xsl:choose>
-						<xsl:when test="title != ''">FALSE</xsl:when>
-						<xsl:when test="description != ''">TRUE</xsl:when>
-						<xsl:otherwise>FALSE</xsl:otherwise>
-					</xsl:choose>
+    	        <xsl:with-param name="title"><xsl:value-of select="title"/></xsl:with-param>
+    	        <xsl:with-param name="description">
+    	            <xsl:choose>
+        	            <xsl:when test="content:encoded">
+                	        <xsl:value-of select="content:encoded"/>
+        	            </xsl:when>
+        	            <xsl:when test="dc:content">
+                	        <xsl:value-of select="dc:content"/>
+        	            </xsl:when>
+            	        <xsl:otherwise>
+                	        <xsl:value-of select="description"/>
+            	        </xsl:otherwise>
+        	        </xsl:choose>
     	        </xsl:with-param>
     	        <xsl:with-param name="link"><xsl:value-of select="link"/></xsl:with-param>
     	        <xsl:with-param name="encLink">
@@ -109,6 +130,16 @@
     <xsl:template match="atom:entry">
 	    <xsl:call-template name="rssItem">
 	        <xsl:with-param name="title"><xsl:value-of select="atom:title"/></xsl:with-param>
+	        <xsl:with-param name="description">
+	            <xsl:choose>
+	                <xsl:when test="atom:content">
+	                    <xsl:value-of select="atom:content"/>
+	                </xsl:when>
+	                <xsl:otherwise>
+	                    <xsl:value-of select="atom:summary"/>
+	                </xsl:otherwise>
+	            </xsl:choose>
+	        </xsl:with-param>
 	        <xsl:with-param name="link"><xsl:value-of select="atom:link[@rel='alternate']/@href"/></xsl:with-param>
 	        <xsl:with-param name="encLink">
 				<xsl:choose>
@@ -127,6 +158,16 @@
 	<xsl:template match="atom10:entry">
 	    <xsl:call-template name="rssItem">
 	        <xsl:with-param name="title"><xsl:value-of select="atom10:title"/></xsl:with-param>
+	        <xsl:with-param name="description">
+	            <xsl:choose>
+	                <xsl:when test="atom10:content">
+	                    <xsl:value-of select="atom10:content"/>
+	                </xsl:when>
+	                <xsl:otherwise>
+	                    <xsl:value-of select="atom10:summary"/>
+	                </xsl:otherwise>
+	            </xsl:choose>
+	        </xsl:with-param>
 	        <xsl:with-param name="link"><xsl:value-of select="atom10:link[@rel='alternate']/@href"/></xsl:with-param>
 	        <xsl:with-param name="encLink">
 				<xsl:choose>
@@ -141,6 +182,7 @@
 	<xsl:template name="rssItem">
 	    <xsl:param name="title"/>
 	    <xsl:param name="titleIsMarkup"/>
+	    <xsl:param name="description"/>
 	    <xsl:param name="link"/>
 	    <xsl:param name="linkTarget"/>
 	    <xsl:param name="encLink"/>
@@ -153,16 +195,16 @@
     			<xsl:with-param name="uri"><xsl:value-of select="$encLink"/></xsl:with-param>
     		</xsl:call-template>
     	</xsl:param>
+		<xsl:variable name="uniqueID">
+			<xsl:text>rssItem-</xsl:text>
+			<xsl:value-of select="generate-id(.)"/>
+		</xsl:variable>
     		<xsl:choose>
 			<xsl:when test="$encLink != ''">
 				<xsl:element name="li">
 					<xsl:attribute name="class">
 						<xsl:text>outlineItemNode</xsl:text>
 					</xsl:attribute>
-					<xsl:variable name="uniqueID">
-						<xsl:text>mp3-</xsl:text>
-						<xsl:value-of select="generate-id(.)"/>
-					</xsl:variable>
 					<xsl:element name="span">
 						<xsl:attribute name="onclick">
 							<xsl:text>opmlRenderExCol('</xsl:text>
@@ -172,11 +214,11 @@
 						<xsl:attribute name="class">optimalTarget</xsl:attribute>
 						<xsl:attribute name="style">cursor: pointer; border: none; text-decoration: none; margin-right: 3px;</xsl:attribute>
 						<xsl:element name="img">
-							<xsl:attribute name="name">img-<xsl:value-of select="$uniqueID"/></xsl:attribute>
+							<xsl:attribute name="name"><xsl:text>img-</xsl:text><xsl:value-of select="$uniqueID"/></xsl:attribute>
 							<xsl:attribute name="src"><xsl:value-of select="$imgCollapsed"/></xsl:attribute>
 							<xsl:attribute name="style">text-decoration: none; border: none;</xsl:attribute>
-							<xsl:attribute name="alt">Play Enclosure</xsl:attribute>
-							<xsl:attribute name="title">Play Enclosure</xsl:attribute>
+							<xsl:attribute name="alt">More...</xsl:attribute>
+							<xsl:attribute name="title">More...</xsl:attribute>
 						</xsl:element>
 					</xsl:element>
 					<xsl:element name="a">
@@ -198,8 +240,9 @@
 									</xsl:attribute>
 								</xsl:if>
 								<xsl:choose>
-									<xsl:when test="$titleIsMarkup='TRUE'">
-										<xsl:value-of select="$title" disable-output-escaping="yes"/>
+									<xsl:when test="$title ='' and $description =''">[No title or description]</xsl:when>
+									<xsl:when test="$title ='' and $description !=''">
+									    <xsl:value-of select="$description" disable-output-escaping="yes"/>
 									</xsl:when>
 									<xsl:otherwise>
 										<xsl:value-of select="$title"/>
@@ -208,22 +251,35 @@
 							</xsl:element>
 						</xsl:when>
 						<xsl:otherwise>
-								<xsl:choose>
-									<xsl:when test="$titleIsMarkup='TRUE'">
-										<xsl:value-of select="$title" disable-output-escaping="yes"/>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:value-of select="$title"/>
-									</xsl:otherwise>
-								</xsl:choose>
+							<xsl:choose>
+								<xsl:when test="$title ='' and $description =''">[No title or description]</xsl:when>
+								<xsl:when test="$title ='' and $description !=''">
+								    <xsl:value-of select="$description" disable-output-escaping="yes"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$title"/>
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:otherwise>
 					</xsl:choose>
 					<xsl:element name="ul">
 						<xsl:attribute name="id"><xsl:value-of select="$uniqueID"/></xsl:attribute>
-						<xsl:attribute name="class">flashmp3</xsl:attribute>
+						<xsl:attribute name="class">rssItem</xsl:attribute>
 						<xsl:attribute name="style">
 							<xsl:text>display: none;</xsl:text>
 						</xsl:attribute>
+    					<xsl:if test="$title != '' and $description != ''">
+    				        <xsl:element name="li">
+    				            <xsl:attribute name="class">
+            						<xsl:text>outlineItem</xsl:text>
+			            		</xsl:attribute>
+    				            <xsl:value-of select="$description" disable-output-escaping="yes"/>
+    				        </xsl:element>
+        				</xsl:if>
+                        <xsl:element name="li">
+                            <xsl:attribute name="class">
+        						<xsl:text>outlineItem</xsl:text>
+		            		</xsl:attribute>
 							<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="300" height="20" id="mp3player"
 								codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0">
 								<param name="movie" value="{$uri}" />
@@ -232,9 +288,82 @@
 									type="application/x-shockwave-flash"
 									pluginspage="http://www.macromedia.com/go/getflashplayer" />
 							</object>
+                        </xsl:element>
 					</xsl:element>
 				</xsl:element>
 			</xsl:when>
+			<xsl:when test="$title != '' and $description != ''">
+				<xsl:element name="li">
+					<xsl:attribute name="class">
+						<xsl:text>outlineItemNode</xsl:text>
+					</xsl:attribute>
+					<xsl:element name="span">
+						<xsl:attribute name="onclick">
+							<xsl:text>opmlRenderExCol('</xsl:text>
+							<xsl:value-of select="$uniqueID"/>
+							<xsl:text>');</xsl:text>
+						</xsl:attribute>
+						<xsl:attribute name="class">optimalTarget</xsl:attribute>
+						<xsl:attribute name="style">cursor: pointer; border: none; text-decoration: none; margin-right: 3px;</xsl:attribute>
+						<xsl:element name="img">
+							<xsl:attribute name="name"><xsl:text>img-</xsl:text><xsl:value-of select="$uniqueID"/></xsl:attribute>
+							<xsl:attribute name="src"><xsl:value-of select="$imgCollapsed"/></xsl:attribute>
+							<xsl:attribute name="style">text-decoration: none; border: none;</xsl:attribute>
+							<xsl:attribute name="alt">More...</xsl:attribute>
+							<xsl:attribute name="title">More...</xsl:attribute>
+						</xsl:element>
+					</xsl:element>
+					<xsl:choose>
+						<xsl:when test="$link != ''">
+							<xsl:element name="a">
+								<xsl:attribute name="href">
+									<xsl:value-of select="$link"/>
+								</xsl:attribute>
+								<xsl:if test="$linkTarget != ''">
+									<xsl:attribute name="target">
+										<xsl:value-of select="$linkTarget"/>
+									</xsl:attribute>
+								</xsl:if>
+								<xsl:choose>
+									<xsl:when test="$title ='' and $description =''">[No title or description]</xsl:when>
+									<xsl:when test="$title ='' and $description !=''">
+									    <xsl:value-of select="$description" disable-output-escaping="yes"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$title"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:element>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="$title ='' and $description =''">[No title or description]</xsl:when>
+								<xsl:when test="$title ='' and $description !=''">
+								    <xsl:value-of select="$description" disable-output-escaping="yes"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$title"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>
+					<xsl:element name="ul">
+						<xsl:attribute name="id"><xsl:value-of select="$uniqueID"/></xsl:attribute>
+						<xsl:attribute name="class">rssItem</xsl:attribute>
+						<xsl:attribute name="style">
+							<xsl:text>display: none;</xsl:text>
+						</xsl:attribute>
+    					<xsl:if test="$title != '' and $description != ''">
+    				        <xsl:element name="li">
+    				            <xsl:attribute name="class">
+            						<xsl:text>outlineItem</xsl:text>
+			            		</xsl:attribute>
+    				            <xsl:value-of select="$description" disable-output-escaping="yes"/>
+    				        </xsl:element>
+        				</xsl:if>
+					</xsl:element>
+				</xsl:element>
+        	</xsl:when>
 			<xsl:otherwise>
 				<xsl:element name="li">
 					<xsl:attribute name="class">
@@ -256,25 +385,27 @@
 										<xsl:value-of select="$linkTarget"/>
 									</xsl:attribute>
 								</xsl:if>
-								<xsl:choose>
-									<xsl:when test="$titleIsMarkup='TRUE'">
-										<xsl:value-of select="$title" disable-output-escaping="yes"/>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:value-of select="$title"/>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:element>
+    							<xsl:choose>
+    								<xsl:when test="$title ='' and $description =''">[No title or description]</xsl:when>
+    								<xsl:when test="$title ='' and $description !=''">
+    								    <xsl:value-of select="$description" disable-output-escaping="yes"/>
+    								</xsl:when>
+    								<xsl:otherwise>
+    									<xsl:value-of select="$title"/>
+    								</xsl:otherwise>
+    							</xsl:choose>
+						</xsl:element>
 						</xsl:when>
 						<xsl:otherwise>
-								<xsl:choose>
-									<xsl:when test="$titleIsMarkup='TRUE'">
-										<xsl:value-of select="$title" disable-output-escaping="yes"/>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:value-of select="$title"/>
-									</xsl:otherwise>
-								</xsl:choose>
+							<xsl:choose>
+								<xsl:when test="$title ='' and $description =''">[No title or description]</xsl:when>
+								<xsl:when test="$title ='' and $description !=''">
+								    <xsl:value-of select="$description" disable-output-escaping="yes"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$title"/>
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:element>

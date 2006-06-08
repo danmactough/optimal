@@ -271,7 +271,7 @@ class optimal {
 			}
 		}
 		for (var i=0;i<uls.length;i++) {
-			if (uls[i].firstChild.className != 'outlineItemNodeSub' && uls[i].className != 'flashmp3') {
+			if (uls[i].firstChild.className != 'outlineItemNodeSub' && uls[i].className != 'rssItem') {
 				uls[i].style.display = 'block';
 				if (document.images["img-"+uls[i].id]) {
 					document.images["img-"+uls[i].id].src=[imgExpanded];
@@ -303,7 +303,7 @@ class optimal {
 		if (node.nodeName == 'UL') {
 			uls.push(node);
 		}
-		if (node.childNodes) {
+		if (node.childNodes && node.nodeName == 'LI') {
 			for (var i=0;i<node.childNodes.length;i++) {
 				uls = uls.concat(getULsRecursive(node.childNodes[i]));
 			}
@@ -427,9 +427,9 @@ class optimal {
 	?>
 	<style type="text/css">
 	<!--
-	ul.main, ul.outlineList, ul.flashmp3 {
+	ul.main, ul.outlineList {
 	margin-left: 15px;
-	padding: 0;
+	padding: 0px;
 	}
 	.outlineRoot img, ul.main img {
 	border: none;
@@ -445,6 +445,15 @@ class optimal {
 	margin-left: 0px;
 	text-indent: -15px;
 	}
+	ul.rssItem {
+	margin-left: 0px;
+	padding: 0px;
+	}
+	ul.rssItem li.outlineItem {
+	list-style: none outside;
+	margin-left: 0px;
+	text-indent: 0px;
+	}
 	li.outlineItemNodeSub {
 	list-style: none outside;
 	margin-left: 0px;
@@ -455,8 +464,8 @@ class optimal {
 	margin-left: 15px;
 	}
 	.optimalAllExpandCollapse {
-	margin: 3ex 0 0;
-	padding: 0;
+	margin: 3ex 0px 0px;
+	padding: 0px;
 	font-size: 87%;
 	}
 	.optimalTarget {
@@ -467,8 +476,8 @@ class optimal {
 	text-decoration: underline;
 	}
 	.optimalSourceLink {
-	margin: 0 0 3ex;
-	padding: 0;
+	margin: 0px 0px 3ex;
+	padding: 0px;
 	border-top: 1px solid #ddd;
 	}
 	.optimalSourceLink a, .optimalSourceLink img {
