@@ -41,12 +41,21 @@ class optimal {
 	var $_cachefile;
 	var $xml;
 	
-	function optimal () { // Constructor
-		$this->basefilepath = $_SERVER['DOCUMENT_ROOT'];
-		$this->baseuripath = 'http://'.$_SERVER['SERVER_NAME'];
-		$this->relpath = str_replace($this->basefilepath, '', dirname(__FILE__)) ?
-			str_replace($this->basefilepath, '', dirname(__FILE__)) :
+	function optimal ($basefilepath = NULL, $baseuripath = NULL, $relpath = NULL) { // Constructor
+        /* The user may pass the path parameters if for some reason the 
+           autodiscovery in this function does not work (such as Aliased directories) */
+		
+		$this->basefilepath = $basefilepath ? $basefilepath : $_SERVER['DOCUMENT_ROOT'];
+		$this->baseuripath = $baseuripath ? $baseuripath : 'http://'.$_SERVER['SERVER_NAME'];
+		if ($relpath)
+			$this->relpath = $relpath;
+		else
+			$this->relpath = str_replace($this->basefilepath, '', dirname(__FILE__)) ? str_replace($this->basefilepath, '', dirname(__FILE__)) : '';
+/*
+		$this->relpath = str_replace($this->basefilepath, '', dirname($_SERVER['SCRIPT_NAME'])) ?
+			str_replace($this->basefilepath, '', dirname($_SERVER['SCRIPT_NAME'])) :
 			'';
+*/
 	}
 	
 	function _error_messages () {
@@ -136,10 +145,12 @@ class optimal {
 	function renderXML ($url, $flForceRefresh = FALSE, $options = array()) {
 		/*    This is the main method.    */
 		error_reporting(0);
+
+		/* This is used to wrap the entire outline so that the expand/collapse
+		   javascript function only operates on this outline */
 		if (!$this->mainID)
 			$this->mainID = uniqid('optimal-');
 
-		
 		// The options array
 		$depth = NULL !== $options['depth'] ? $options['depth'] : 1;
 		$flIsNode = $options['flIsNode'];
@@ -164,13 +175,10 @@ class optimal {
 			return $this->_error_messages();
 		}
 	
-		//$opmlLink = $url;
-	
 		// You can use locally stored files that are under your server's root
 		// document folder by specifying a relative local path
 		if (strpos($url, '/') === 0) { # a relative local path
 			$flIsLocal = TRUE;
-			//$url = $localroot . $url;
 		} else {
 			$flIsLocal = FALSE;
 		}
@@ -236,6 +244,9 @@ class optimal {
 		// End prepare XSL parameters
 
 		$xslt_result = $this->_XSLtransform($this->xml, $xsl, $parameter_array);
+		
+		if ($type == 'RSS')
+			$xslt_result = $this->fixLinkTargets ($xslt_result, $linkTarget);
 
 		if ($xslt_result) {
 			if ($xmlIsCached) {
@@ -250,7 +261,13 @@ class optimal {
 		return false; // This should never be reached
 	} // End function renderXML
 
-	function printHeadJavaScript ($absuripath = NULL) {
+	function fixLinkTargets ($str, $linkTarget) {
+		$search = array('/target=.+? /ims', '/<a /ims');
+		$replace = array(' ', "<a target=\"$linkTarget\" ",);
+		return preg_replace($search, $replace, $str);
+	}
+
+	function printHeadJavaScript ($absuripath = NULL, $linkTarget = '_blank') {
 		if (!$absuripath) {
 			$absuripath = $this->baseuripath.$this->relpath;
 		}

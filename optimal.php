@@ -32,7 +32,8 @@ danmactough AT yahoo DOT com
 // Instantiate the class
 //
 require_once('class.optimal.php');
-$optimal = new optimal;
+$optimal = new optimal; # The basefilepath, baseuripath, and relpath parameters can be passed here if autodiscovery isn't working.
+                        # E.g.,  $optimal = new optimal ('E:/00_Projects', NULL, '/optimal');
 
 //
 // Define some initial variables
