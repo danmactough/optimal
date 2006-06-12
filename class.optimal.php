@@ -328,7 +328,7 @@ class optimal {
 		return uls;
 	}
 
-	function opmlRenderExCol(id, isNode, url) {
+	function optimalToggleNode(id, isNode, url) {
 		if (isNode != null) {
 			xmlhttpGetOpml (url, id);
 		}
@@ -511,13 +511,11 @@ class optimal {
 	if (document.images)
 	{
 	<?php
-		{ // Scoping brace
 		$i = '1';
-			chdir($this->basefilepath.$this->relpath);
-			foreach (glob("img/*") as $filename) {
-				echo "\tpic".$i."= new Image(8,8);\n\tpic".$i.".src='".$absuripath.'/'.$filename."';\n";
-				$i++;
-			}
+		chdir($this->basefilepath.$this->relpath);
+		foreach (glob("img/*") as $filename) {
+			echo "\tpic".$i."= new Image(8,8);\n\tpic".$i.".src='".$absuripath.'/'.$filename."';\n";
+			$i++;
 		}
 	?>
 	}

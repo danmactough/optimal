@@ -101,14 +101,14 @@
 			<xsl:when test="child::outline and (count(ancestor::outline) &lt; $depth) and $isOPML != 'true' and not(@xmlUrl)">
 				<xsl:call-template name="lineItem">
 				    <xsl:with-param name="imgExpCol" select="$imgExpanded"/>
-				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>');</xsl:with-param>
+				    <xsl:with-param name="jsCmd">optimalToggleNode('<xsl:value-of select="$uniqueID"/>');</xsl:with-param>
 				    <xsl:with-param name="uniqueID" select="$uniqueID"/>
  				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test="child::outline and $isOPML != 'true' and not(@xmlUrl)">
 				<xsl:call-template name="lineItem">
 				    <xsl:with-param name="imgExpCol" select="$imgCollapsed"/>
-				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>');</xsl:with-param>
+				    <xsl:with-param name="jsCmd">optimalToggleNode('<xsl:value-of select="$uniqueID"/>');</xsl:with-param>
 				    <xsl:with-param name="uniqueID" select="$uniqueID"/>
  				</xsl:call-template>
 			</xsl:when>
@@ -138,7 +138,7 @@
 				<xsl:call-template name="lineItem">
 				    <xsl:with-param name="imgExpCol" select="$imgCollapsed"/>
 				    <xsl:with-param name="isOPML" select="$isOPML"/>
-				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>', 'true', '<xsl:value-of select="$nodeRender"/>?<xsl:value-of select="$jsQueryStr"/>');</xsl:with-param>
+				    <xsl:with-param name="jsCmd">optimalToggleNode('<xsl:value-of select="$uniqueID"/>', 'true', '<xsl:value-of select="$nodeRender"/>?<xsl:value-of select="$jsQueryStr"/>');</xsl:with-param>
 				    <xsl:with-param name="opmlUrl" select="$opmlUrl"/>
 				    <xsl:with-param name="uniqueID" select="$uniqueID"/>
  				</xsl:call-template>
@@ -155,7 +155,7 @@
 				</xsl:variable>
 				<xsl:call-template name="lineItem">
 				    <xsl:with-param name="imgExpCol" select="$imgCollapsed"/>
-				    <xsl:with-param name="jsCmd">opmlRenderExCol('<xsl:value-of select="$uniqueID"/>', 'true', '<xsl:value-of select="$nodeRender"/>?<xsl:value-of select="$jsQueryStr"/>');</xsl:with-param>
+				    <xsl:with-param name="jsCmd">optimalToggleNode('<xsl:value-of select="$uniqueID"/>', 'true', '<xsl:value-of select="$nodeRender"/>?<xsl:value-of select="$jsQueryStr"/>');</xsl:with-param>
 				    <xsl:with-param name="uniqueID" select="$uniqueID"/>
  				</xsl:call-template>
 			</xsl:when>

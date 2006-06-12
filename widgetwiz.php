@@ -91,9 +91,9 @@ if ($_GET['url'] && 'http://' != $_GET['url'] && (0 == $_GET['depth'] || $_GET['
 <td>Links Will Open In...</td>
 <td>
 	<select size="1" name="linktarget" tabindex="3" style="width: 20em;">
-		<option value="_parent"<?php echo ('_parent' == $_GET['linktarget']) ? ' selected' : '' ?>>The Main Window</option>
+		<option value="_top"<?php echo ('_top' == $_GET['linktarget']) ? ' selected' : '' ?>>The Main Window</option>
 		<option value="_blank"<?php echo ('_blank' == $_GET['linktarget']) ? ' selected' : '' ?>>A New Window</option>
-		<option value="_self"<?php echo ('_self' == $_GET['linktarget']) ? ' selected' : '' ?>>The IFRAME</option>
+		<option value="_self"<?php echo ('_self' == $_GET['linktarget']) ? ' selected' : '' ?>>The IFRAME (NOT recommended)</option>
 	</select>
 </td>
 </tr>

@@ -249,7 +249,7 @@ if ($flForceRefresh) {
 	<td class="formElement" style="text-align: center; padding-top: 1ex;"><span style="font-size: 85%;">Standalone<br /><input type="checkbox" name="standalone" value="1"/></span></td>
 	</tr>
 	<tr>
-      <td class="formElement" colspan="2"><a href="<?= $_SERVER['SCRIPT_NAME'] ?>?url=http://hosting.opml.org/yabfog/dailyReading.opml" title="Click here to render a sample OPML file">Render Sample OPML</a></td>
+      <td class="formElement" colspan="2"><a href="<?= $_SERVER['SCRIPT_NAME'] ?>?url=http://www.yabfog.com/opml0/dailyReading.opml" title="Click here to render a sample OPML file">Render Sample OPML</a></td>
       <td class="formElement" colspan="2" style="text-align: right; height: 4ex; vertical-align: bottom;">
         <a href="http://www.scripting.com/" target="_blank"><img src="img/thanksdave.gif" alt="Thanks, Dave!" title="Thanks, Dave!"></a>
       </td>

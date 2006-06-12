@@ -207,7 +207,7 @@
 					</xsl:attribute>
 					<xsl:element name="span">
 						<xsl:attribute name="onclick">
-							<xsl:text>opmlRenderExCol('</xsl:text>
+							<xsl:text>optimalToggleNode('</xsl:text>
 							<xsl:value-of select="$uniqueID"/>
 							<xsl:text>');</xsl:text>
 						</xsl:attribute>
@@ -299,7 +299,7 @@
 					</xsl:attribute>
 					<xsl:element name="span">
 						<xsl:attribute name="onclick">
-							<xsl:text>opmlRenderExCol('</xsl:text>
+							<xsl:text>optimalToggleNode('</xsl:text>
 							<xsl:value-of select="$uniqueID"/>
 							<xsl:text>');</xsl:text>
 						</xsl:attribute>
@@ -456,7 +456,7 @@
     		</xsl:attribute>
             <xsl:element name="span">
                 <xsl:attribute name="onclick">
-					<xsl:text>opmlRenderExCol('</xsl:text>
+					<xsl:text>optimalToggleNode('</xsl:text>
 					<xsl:value-of select="$uniqueID"/>
 					<xsl:text>');</xsl:text>
 				</xsl:attribute>
