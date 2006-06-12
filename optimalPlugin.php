@@ -3,8 +3,8 @@
 /*
 Plugin Name: Optimal Plugin (formerly, OPML Renderer)
 Plugin URI: http://www.yabfog.com/wp/optimal-plugin/
-Description: Renders valid OPML from any source as an expandable/collapsible list. <em>Usage in code:</em> <code>OPMLRender('url','updatetime','css class','depth','flags');</code> <em>Usage in pages / posts:</em> <code>!OPMLRender : url,updatetime,css class,depth,flags</code> <em>where 'updatetime' is the number of seconds to cache a file before requesting an update, 'css class' indicates the CSS class to be applied to the &lt;div&gt; that wraps the rendered outline, 'depth' indicates how many levels to initially expand the outline (excluding inclusions), and 'flags' is the sum of the display flags you wish to set TRUE (currently, '1' = 'Print a header with links to Expand/Collapse all nodes' and '2' = 'Print a header with a link to the source OPML file').</em>
-Version: 0.7 (beta)
+Description: Renders valid OPML from any source as an expandable/collapsible list. <em>Usage in code:</em> <code>OPMLRender('url','updatetime','css class','depth','flags');</code> <em>Usage in pages / posts:</em> <code>!OPMLRender : url,updatetime,css class,depth,flags</code> <em>where 'updatetime' is the number of seconds to cache a file before requesting an update, 'css class' indicates the CSS class to be applied to the &lt;div&gt; that wraps the rendered outline, 'depth' indicates how many levels to initially expand the outline (excluding inclusions), and 'flags' is the sum of the display flags you wish to set TRUE (currently, '1' = 'Print a header with links to Expand/Collapse all nodes' and '2' = 'Print a footer with a link to the source OPML file').</em>
+Version: 0.4 (beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -52,8 +52,10 @@ function OPMLContent ($content = '') {
 	foreach ($matches as $match) {
 		$replacement = NULL;
 		list($url, $maxAge, $presentation, $depth, $flags) = explode(",",strip_tags(rtrim($match[1])));
-		// This is for some sort of backwards compatibility
-		if ('page' == $presentation) {
+		
+		if (!$maxAge) # Set a default of 14400 secods, or 4 hours
+			$maxAge = 14400;
+		if ('page' == $presentation) { # This is for some sort of backwards compatibility
 			$presentation = 'opmlPage';
 		} elseif ('sidebar' == $presentation) {
 			$presentation = 'opmlSidebar';
