@@ -3,7 +3,7 @@
 Name: Optimal OPML Browser
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: Renders valid OPML from any source in a tree-like view. Links to external OPML files as well as RSS, RDF, and Atom feeds are expanded in place.
-Version: 0.4b(beta)
+Version: 0.4c (beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -31,13 +31,15 @@ danmactough AT yahoo DOT com
 //
 // Instantiate the class
 //
-global $optimal_plugin_main;
-if (isset($optimal_plugin_main)) { # True is used as a plugin
-    $optimal = $optimal_plugin_main;
+require_once('class.optimal.php');
+
+if (file_exists(dirname(__FILE__).'/settings.optimal.inc')) { # True if used as a plugin
+	list ($basefilepath, $baseuripath, $relpath, $localbasefilepath) =
+		explode(',', file_get_contents(dirname(__FILE__).'/settings.optimal.inc'));
+    $optimal = new optimal( $basefilepath, $baseuripath, $relpath, $localbasefilepath );
 } else {
-	require_once('class.optimal.php');
-	$optimal = new optimal; # The basefilepath, baseuripath, and relpath parameters can be passed here if autodiscovery isn't working.
-							# E.g.,  $optimal = new optimal ('E:/00_Projects', NULL, '/optimal');
+	$optimal = new optimal; # The basefilepath, baseuripath, relpath and localbasefilepath parameters can be passed here if autodiscovery isn't working.
+							# E.g.,  $optimal = new optimal ('E:/00_Projects', NULL, '/optimal', $_SERVER['DOCUMENT_ROOT']);
 }
 
 //

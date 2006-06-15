@@ -3,7 +3,7 @@
 Name: class.optimal.php
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.4b(beta)
+Version: 0.4c (beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
