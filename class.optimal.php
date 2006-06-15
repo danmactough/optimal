@@ -186,7 +186,7 @@ class optimal {
 		$this->_cachefile = $this->basefilepath.$this->relpath.'/_cache/'.md5($url).'.'.strtolower($type).'.xml';
 
 		$this->debuginfo = "<br/>$type URL: <a href=\"$url\">$url</a><br/>\nCache file: ";
-		$this->debuginfo .= $this->_cachefile ? '<a href="'.$this->relpath.'/_cache/'.basename($this->_cachefile).'">'.basename($this->_cachefile).'</a>' : "None";
+		$this->debuginfo .= $this->_cachefile ? '<a href="'.$this->baseuripath.$this->relpath.'/_cache/'.basename($this->_cachefile).'">'.basename($this->_cachefile).'</a>' : "None";
 		$this->debuginfo .= "<br/>\n";
 
 		// Get file contents

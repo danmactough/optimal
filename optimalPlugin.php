@@ -33,7 +33,7 @@ danmactough AT yahoo DOT com
 
 // This pulls in the Optimal functions
 require_once('class.optimal.php');
-$optimal_plugin_main = new optimal;
+$optimal_plugin_main = new optimal( rtrim( ABSPATH, '/' ), get_bloginfo('url') );
 
 // This is a Wordpress content filter that replaces calls to OPMLContent
 // Calls must be in the following form:
