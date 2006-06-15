@@ -3,7 +3,7 @@
 Name: class.optimal.php
 Homepage: http://www.yabfog.com/wp/optimal/
 Description: A component of Optimal
-Version: 0.4(beta)
+Version: 0.4b(beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -33,6 +33,7 @@ class optimal {
 	var $basefilepath;
 	var $baseuripath;
 	var $relpath;
+	var $localbasefilepath;
 	var $mainID;
 
 	var $errors = array();
@@ -41,7 +42,7 @@ class optimal {
 	var $_cachefile;
 	var $xml;
 	
-	function optimal ($basefilepath = NULL, $baseuripath = NULL, $relpath = NULL) { // Constructor
+	function optimal ($basefilepath = NULL, $baseuripath = NULL, $relpath = NULL, $localbasefilepath = NULL) { // Constructor
         /* The user may pass the path parameters if for some reason the 
            autodiscovery in this function does not work (such as Aliased directories) */
 		
@@ -51,11 +52,10 @@ class optimal {
 			$this->relpath = $relpath;
 		else
 			$this->relpath = str_replace($this->basefilepath, '', dirname(__FILE__)) ? str_replace($this->basefilepath, '', dirname(__FILE__)) : '';
-/*
-		$this->relpath = str_replace($this->basefilepath, '', dirname($_SERVER['SCRIPT_NAME'])) ?
-			str_replace($this->basefilepath, '', dirname($_SERVER['SCRIPT_NAME'])) :
-			'';
-*/
+		if ($localbasefilepath)
+			$this->localbasefilepath = $localbasefilepath;
+		else
+			$this->localbasefilepath = $this->basefilepath;
 	}
 	
 	function _error_messages () {
@@ -192,7 +192,7 @@ class optimal {
 		// Get file contents
 		if ($flIsLocal) {
 			// We are rendering a local file
-			$this->xml = $this->_fetch_file($this->basefilepath.$url, TRUE);
+			$this->xml = $this->_fetch_file($this->localbasefilepath.$url, TRUE);
 		} elseif ( (!$flForceRefresh) && file_exists($this->_cachefile) && ( filesize($this->_cachefile) > 0 ) && ( filemtime($this->_cachefile) > ( time() - $maxAge ) ) ) {
 			// We have a local, non-empty, recent copy, so use it
 			$this->xml = $this->_fetch_file($this->_cachefile, TRUE);

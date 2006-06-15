@@ -4,7 +4,7 @@
 Plugin Name: Optimal Plugin (formerly, OPML Renderer)
 Plugin URI: http://www.yabfog.com/wp/optimal-plugin/
 Description: Renders valid OPML from any source as an expandable/collapsible list. <em>Usage in code:</em> <code>OPMLRender('url','updatetime','css class','depth','flags');</code> <em>Usage in pages / posts:</em> <code>!OPMLRender : url,updatetime,css class,depth,flags</code> <em>where 'updatetime' is the number of seconds to cache a file before requesting an update, 'css class' indicates the CSS class to be applied to the &lt;div&gt; that wraps the rendered outline, 'depth' indicates how many levels to initially expand the outline (excluding inclusions), and 'flags' is the sum of the display flags you wish to set TRUE (currently, '1' = 'Print a header with links to Expand/Collapse all nodes' and '2' = 'Print a footer with a link to the source OPML file').</em>
-Version: 0.4 (beta)
+Version: 0.4b (beta)
 Author: Dan MacTough
 Author URI: http://www.yabfog.com/
 License: GPL
@@ -33,7 +33,7 @@ danmactough AT yahoo DOT com
 
 // This pulls in the Optimal functions
 require_once('class.optimal.php');
-$optimal_plugin_main = new optimal( rtrim( ABSPATH, '/' ), get_bloginfo('url') );
+$optimal_plugin_main = new optimal( rtrim( ABSPATH, '/' ), get_bloginfo('url'), NULL, $_SERVER['DOCUMENT_ROOT'] );
 
 // This is a Wordpress content filter that replaces calls to OPMLContent
 // Calls must be in the following form:
